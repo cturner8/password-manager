@@ -1,46 +1,30 @@
 ﻿@page "/fetchdata"
 
 @using PasswordManager.Data
-@inject WeatherForecastService ForecastService
+@using PasswordManager.Models;
+@using PasswordManager.Services;
 
-<h1>Weather forecast</h1>
+@inject UserService UserService
+@inject ILogger<FetchData> logger;
 
-<p>This component demonstrates fetching data from a service.</p>
-
-@if (forecasts == null)
+@if (users == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <h1>Users (@users.Count())</h1>
+
+    <p>This component demonstrates fetching data from a service.</p>
 }
 
 @code {
-    private WeatherForecast[] forecasts;
+    private IEnumerable<User> users;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        logger.LogDebug("Fetching users");
+        users = await UserService.GetUsers();
+        logger.LogDebug($"Received Users: {users.Count()}");
     }
 }
