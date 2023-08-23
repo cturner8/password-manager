@@ -1,5 +1,5 @@
-﻿using PasswordManager.Context;
-using PasswordManager.Models;
+﻿using Database.Context;
+using Database.Models;
 
 namespace PasswordManager.Services;
 

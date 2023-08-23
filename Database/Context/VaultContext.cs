@@ -1,7 +1,7 @@
-﻿namespace PasswordManager.Context;
+﻿namespace Database.Context;
 
+using Database.Models;
 using Microsoft.EntityFrameworkCore;
-using PasswordManager.Models;
 
 public class VaultContext : DbContext
 {

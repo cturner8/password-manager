@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Database.Context;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using PasswordManager.Context;
 using PasswordManager.Data;
 using PasswordManager.Services;
 
