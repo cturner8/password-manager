@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "dotnet-launch-settings",
+            "name": "Run App",
+            "profileName": "Debug",
+            "projectPath": "PasswordManager/PasswordManager.csproj.user",
+            "targetFramework": "net7.0-windows10.0.19041.0",
+        },
+    ]
+}
