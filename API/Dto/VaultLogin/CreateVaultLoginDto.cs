@@ -1,8 +1,8 @@
-﻿namespace Database.Models;
+﻿namespace API.Dto.VaultLogin;
 
-public class VaultLogin : Entity
+public class CreateVaultLoginDto
 {
-    public Guid VaultId { get; set; }
+    public Guid UserId { get; set; }
     public required string Name { get; set; }
     public string? Description { get; set; }
     public required string URL { get; set; }
@@ -11,7 +11,4 @@ public class VaultLogin : Entity
     public required string Password { get; set; }
     public string? Notes { get; set; }
     public string? Category { get; set; }
-    public bool Active { get; set; }
-
-    public required Vault Vault { get; set; }
 }

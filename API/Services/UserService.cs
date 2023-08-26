@@ -1,7 +1,7 @@
 ﻿using API.Dto.User;
+using API.Exceptions;
 using Database.Context;
 using Database.Models;
-using System.Security.Authentication;
 
 namespace API.Services;
 
@@ -14,30 +14,42 @@ public class UserService
         _vaultContext = vaultContext;
     }
 
-    public User Add(CreateUserDto createUserDto)
+    public User SignUp(SignUpDto dto)
     {
         var user = new User()
         {
-            Email = createUserDto.Email,
-            Firstname = createUserDto.Firstname,
-            Surname = createUserDto.Surname,
-            Vaults = new List<Vault>(),
+            Email = dto.Email,
+            Firstname = dto.Firstname,
+            Surname = dto.Surname,
+            Vaults = new List<Vault>() { },
             CreatedDate = DateTime.UtcNow,
             UpdatedDate = DateTime.UtcNow,
         };
+        var userVault = new Vault()
+        {
+            Name = "My Vault",
+            Logins = new List<VaultLogin>(),
+            Notes = new List<VaultNote>(),
+            User = user,
+            CreatedDate = DateTime.UtcNow,
+            UpdatedDate = DateTime.UtcNow,
+            Active = true
+        };
 
         _vaultContext.Users.Add(user);
+        user.Vaults.Add(userVault);
+
         _vaultContext.SaveChanges();
 
         return user;
     }
 
-    public User Authenticate(UserAuthDto userAuthDto)
+    public User SignIn(SignInDto dto)
     {
-        var user = _vaultContext.Users.Where(x => x.Email == userAuthDto.Email).SingleOrDefault();
+        var user = _vaultContext.Users.Where(x => x.Email == dto.Email).SingleOrDefault();
         if (user == null)
         {
-            throw new AuthenticationException();
+            throw new SignInException();
         }
 
         return user;
