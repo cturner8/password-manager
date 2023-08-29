@@ -35,4 +35,9 @@ public class VaultNoteService
 
         return vaultNote;
     }
+
+    public IEnumerable<VaultNote> GetAll()
+    {
+        return _vaultContext.VaultNotes;
+    }
 }

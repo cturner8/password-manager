@@ -1,39 +1,37 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">PasswordManager</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+﻿<div class="top-row ps-3 relative flex flex-wrap items-center content-between py-3 px-4 text-white">
+    <div class="container mx-auto sm:px-4 max-w-full mx-auto sm:px-4">
+        <a class="inline-block pt-1 pb-1 mr-4 text-lg whitespace-no-wrap" href="">PasswordManager</a>
+    
     </div>
 </div>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+<div >
+    <nav class="flex-col text-white">
+        <div class=" px-3">
+            <NavLink class="inline-block py-2 px-4 no-underline" href="" Match="NavLinkMatch.All">
+                Home
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+        <div class=" px-3">
+            <NavLink class="inline-block py-2 px-4 no-underline" href="account">
+                Account
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+        <div class=" px-3">
+            <NavLink class="inline-block py-2 px-4 no-underline" href="logins">
+                Logins
+            </NavLink>
+        </div>
+        <div class=" px-3">
+            <NavLink class="inline-block py-2 px-4 no-underline" href="notes">
+               Notes
+            </NavLink>
+        </div>
+        <div class=" px-3">
+            <NavLink class="inline-block py-2 px-4 no-underline" href="settings">
+                Settings
             </NavLink>
         </div>
     </nav>
 </div>
 
-@code {
-    private bool collapseNavMenu = true;
-
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}

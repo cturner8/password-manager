@@ -41,6 +41,11 @@ public class VaultLoginService
         return vaultLogin;
     }
 
+    public IEnumerable<VaultLogin> GetAll()
+    {
+        return _vaultContext.VaultLogins.AsEnumerable();
+    }
+
     public string GeneratePassword(GeneratePasswordDto dto)
     {
         var password = new Password(

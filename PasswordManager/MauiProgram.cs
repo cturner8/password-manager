@@ -1,8 +1,7 @@
-﻿using Database.Context;
+﻿using API.Services;
+using Database.Context;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using PasswordManager.Data;
-using PasswordManager.Services;
 
 namespace PasswordManager
 {
@@ -39,8 +38,9 @@ namespace PasswordManager
 
             builder.Services.AddSingleton<VaultContext>();
 
-            builder.Services.AddSingleton<WeatherForecastService>();
-            builder.Services.AddSingleton<UserService>();
+            builder.Services.AddSingleton<VaultService>();
+            builder.Services.AddSingleton<VaultLoginService>();
+            builder.Services.AddSingleton<VaultNoteService>();
 
 
             builder.Services.AddLogging();
