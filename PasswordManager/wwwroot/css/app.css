@@ -1,4 +1,8 @@
-﻿html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+﻿@font-face {
+    font-family: 'Open Sans Regular';
+    src: url('../assets/OpenSans-Regular.ttf') format('truetype');
 }
 
+html, body {
+    font-family: 'Open Sans Regular', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
