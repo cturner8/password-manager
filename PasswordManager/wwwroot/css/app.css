@@ -1,8 +1,12 @@
 ﻿@font-face {
     font-family: 'Open Sans Regular';
-    src: url('../assets/OpenSans-Regular.ttf') format('truetype');
+    src: url('../assets/fonts/OpenSans-Regular.ttf') format('truetype');
 }
 
 html, body {
     font-family: 'Open Sans Regular', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+#blazor-error-ui {
+    display: none;
 }
