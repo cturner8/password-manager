@@ -1,8 +1,5 @@
 ﻿@page "/logins/create"
 
-@using API.Dto.VaultLogin;
-@using API.Services;
-
 @inject ILogger<Create> Logger
 @inject VaultLoginService VaultLoginService
 
@@ -56,7 +53,7 @@
 </EditForm>
 
 @code {
-    public CreateVaultLoginDto Model { get; set; }
+    public VaultLoginModel Model { get; set; }
 
     protected override void OnInitialized()
     {
@@ -67,7 +64,6 @@
     {
         Model = new()
         {
-            UserId = Guid.Parse("ED8AAE48-E379-43B5-BADC-EE1627B6361A"), // TODO
             Email = "",
             Name = "",
             Password = "",
@@ -83,7 +79,19 @@
     {
         Logger.LogInformation("Form Submitted");
 
-        var vaultLogin = VaultLoginService.Create(Model);
+        var dto = new CreateVaultLoginDto()
+        {
+            UserId = Guid.Parse("ED8AAE48-E379-43B5-BADC-EE1627B6361A"), // TODO
+            Name = Model.Name,
+            Description = Model.Description,
+            URL = Model.URL,
+            Email = Model.Email,
+            Username = Model.Username,
+            Password = Model.Password,
+            Category = Model.Category,
+            Notes = Model.Notes
+        };
+        var vaultLogin = VaultLoginService.Create(dto);
 
         Logger.LogInformation($"Created vault login: {vaultLogin.Id}");
 
