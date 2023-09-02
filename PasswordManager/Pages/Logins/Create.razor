@@ -37,6 +37,7 @@
         Password:<br>
         <InputText @bind-Value="Model!.Password" type="password" id="password" />
     </label><br>
+    <button @onclick="GeneratePassword" type="button">Generate Password</button><br>
 
     <label for="notes">
         Notes:<br>
@@ -96,5 +97,13 @@
         Logger.LogInformation($"Created vault login: {vaultLogin.Id}");
 
         InitialiseModel();
+    }
+
+    private void GeneratePassword(EventArgs e)
+    {
+        var dto = new GeneratePasswordDto();
+        var password = VaultLoginService.GeneratePassword(dto);
+
+        Model.Password = password;
     }
 }
