@@ -1,0 +1,64 @@
+﻿@page "/notes/create"
+
+@inject ILogger<Create> Logger
+@inject VaultNoteService VaultNoteService
+
+
+<h1 class="font-bold my-8">New Note</h1>
+
+<EditForm Model="@Model" OnSubmit="@Submit">
+
+    <label for="name">
+        Name:<br>
+        <InputText @bind-Value="Model!.Name" id="name" />
+    </label><br>
+
+    <label for="description">
+        Description:<br>
+        <InputTextArea @bind-Value="Model!.Description" id="description" />
+    </label><br>
+
+    <label for="note">
+        Note:<br>
+        <InputTextArea @bind-Value="Model!.Note" id="note"  />
+    </label><br>
+  
+    <button type"submit">Save</button>
+</EditForm>
+
+@code {
+    public VaultNoteModel Model { get; set; }
+
+    protected override void OnInitialized()
+    {
+        InitialiseModel();
+    }
+
+    private void InitialiseModel()
+    {
+        Model = new()
+        {
+            Name = "",
+            Description = "",
+            Note = "",
+        };
+    }
+
+    private void Submit()
+    {
+        Logger.LogInformation("Form Submitted");
+
+        var dto = new CreateVaultNoteDto()
+        {
+            UserId = Guid.Parse("ED8AAE48-E379-43B5-BADC-EE1627B6361A"), // TODO
+            Name = Model.Name,
+            Description = Model.Description,
+            Note = Model.Note
+        };
+        var vaultNote = VaultNoteService.Create(dto);
+
+        Logger.LogInformation($"Created vault note: {vaultNote.Id}");
+
+        InitialiseModel();
+    }
+}

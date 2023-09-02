@@ -1,0 +1,100 @@
+﻿@page "/logins/create"
+
+@inject ILogger<Create> Logger
+@inject VaultLoginService VaultLoginService
+
+
+<h1 class="font-bold my-8">New Login</h1>
+
+<EditForm Model="@Model" OnSubmit="@Submit">
+
+    <label for="name">
+        Name:<br>
+        <InputText @bind-Value="Model!.Name" id="name" />
+    </label><br>
+
+    <label for="description">
+        Description:<br>
+        <InputTextArea @bind-Value="Model!.Description" id="description" />
+    </label><br>
+
+    <label for="url">
+        URL:<br>
+        <InputText @bind-Value="Model!.URL" id="url" />
+    </label><br>
+
+    <label for="email">
+        Email:<br>
+        <InputText @bind-Value="Model!.Email" type="email" id="email" />
+    </label><br>
+
+    <label for="username">
+        Username:<br>
+        <InputText @bind-Value="Model!.Username" id="username" />
+    </label><br>
+
+    <label for="password">
+        Password:<br>
+        <InputText @bind-Value="Model!.Password" type="password" id="password" />
+    </label><br>
+
+    <label for="notes">
+        Notes:<br>
+        <InputTextArea @bind-Value="Model!.Notes" id="notes"  />
+    </label><br>
+
+
+    <label for="category">
+        Category:<br>
+        <InputText @bind-Value="Model!.Category" id="category" />
+    </label><br>
+  
+    <button type"submit">Save</button>
+</EditForm>
+
+@code {
+    public VaultLoginModel Model { get; set; }
+
+    protected override void OnInitialized()
+    {
+        InitialiseModel();
+    }
+
+    private void InitialiseModel()
+    {
+        Model = new()
+        {
+            Email = "",
+            Name = "",
+            Password = "",
+            URL = "",
+            Category = "",
+            Description = "",
+            Notes = "",
+            Username = ""
+        };
+    }
+
+    private void Submit()
+    {
+        Logger.LogInformation("Form Submitted");
+
+        var dto = new CreateVaultLoginDto()
+        {
+            UserId = Guid.Parse("ED8AAE48-E379-43B5-BADC-EE1627B6361A"), // TODO
+            Name = Model.Name,
+            Description = Model.Description,
+            URL = Model.URL,
+            Email = Model.Email,
+            Username = Model.Username,
+            Password = Model.Password,
+            Category = Model.Category,
+            Notes = Model.Notes
+        };
+        var vaultLogin = VaultLoginService.Create(dto);
+
+        Logger.LogInformation($"Created vault login: {vaultLogin.Id}");
+
+        InitialiseModel();
+    }
+}

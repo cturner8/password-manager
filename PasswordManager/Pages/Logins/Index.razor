@@ -1,0 +1,49 @@
+﻿@page "/logins"
+
+
+@using API.Services;
+@using Database.Models;
+
+@inject VaultLoginService VaultLoginService
+
+@if (logins == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h1 class="font-bold my-8">Logins (@logins.Count())</h1>
+    <NavLink href="logins/create">
+        New Login
+    </NavLink>
+    <table class="w-full">
+        <thead class="font-medium">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">URL</th>
+                <th scope="col">Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var login in logins)
+            {
+                <tr>
+                    <td>@login.Name</td>
+                    <td>@login.Description</td>
+                    <td>@login.URL</td>
+                    <td>@login.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<VaultLogin> logins;
+
+    protected override void OnInitialized()
+    {
+        logins = VaultLoginService.GetAll();
+    }
+}

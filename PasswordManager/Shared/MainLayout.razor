@@ -1,0 +1,17 @@
+﻿@inherits LayoutComponentBase
+
+<div class="flex flex-row relative h-screen">
+    <div class="bg-red-600">
+        <NavMenu />
+    </div>
+
+    <main class="flex-1">
+        <div class="p-4 bg-gray-800 flex justify-end items-center text-white">
+            Welcome back!
+        </div>
+
+        <article class="px-4 grow">
+            @Body
+        </article>
+    </main>
+</div>
