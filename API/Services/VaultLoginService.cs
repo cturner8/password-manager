@@ -46,7 +46,7 @@ public class VaultLoginService
         return _vaultContext.VaultLogins.AsEnumerable();
     }
 
-    public string GeneratePassword(GeneratePasswordDto dto)
+    public static string GeneratePassword(GeneratePasswordDto dto)
     {
         var password = new Password(
             includeLowercase: dto.IncludeLowercase,

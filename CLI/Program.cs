@@ -1,72 +1,73 @@
 ﻿using API.Dto.User;
-using API.Dto.VaultLogin;
-using API.Dto.VaultNote;
 using API.Services;
-using Bogus;
 using Database.Context;
+using Encryption.Services;
+using System.Security.Cryptography;
 
+var keyDerivationService = new KeyDerivationService(1000, HashAlgorithmName.SHA256, 32);
+var encryptionService = new EncryptionService();
 var vaultContext = new VaultContext();
 
-var userService = new UserService(vaultContext);
-var vaultService = new VaultService(vaultContext);
-var vaultNoteService = new VaultNoteService(vaultContext, vaultService);
-var vaultLoginService = new VaultLoginService(vaultContext, vaultService);
-
-
+var masterPassword = VaultLoginService.GeneratePassword(new API.Dto.VaultLogin.GeneratePasswordDto());
 var signInDto = new SignInDto()
 {
     Email = "john.doe@contoso.com",
-    MasterPassword = "",
+    MasterPassword = masterPassword,
     //Firstname = "John",
     //Surname = "Doe"
 };
 
-var createVaultNoteDto = new Faker<CreateVaultNoteDto>()
-    .RuleFor(x => x.Name, (f, u) => String.Join(" ", f.Lorem.Words()))
-    .RuleFor(x => x.Note, (f, u) => String.Join(" ", f.Lorem.Words(16)))
-    .RuleFor(x => x.Description, (f, u) => String.Join(" ", f.Lorem.Paragraph()))
-    .Generate();
-
-var createVaultLoginDto = new Faker<CreateVaultLoginDto>()
-    .RuleFor(x => x.Name, (f, u) => String.Join(" ", f.Lorem.Words()))
-    .RuleFor(x => x.Notes, (f, u) => String.Join(" ", f.Lorem.Words(8)))
-    .RuleFor(x => x.Description, (f, u) => String.Join(" ", f.Lorem.Paragraph()))
-    .RuleFor(x => x.URL, (f, u) => f.Internet.Url())
-    .RuleFor(x => x.Username, (f, u) => f.Internet.UserName())
-    .RuleFor(x => x.Email, (f, u) => $"{u.Username}@{f.Internet.DomainName()}")
-    .RuleFor(x => x.Password, (f, u) => f.Internet.Password(f.Random.Number(8, 30)))
-    .Generate();
 
 try
 {
-    var user = userService.SignIn(signInDto);
-    Console.WriteLine($"User: {user.Id}");
+    vaultContext.UserKeyMetadata.RemoveRange(vaultContext.UserKeyMetadata);
+    vaultContext.SaveChanges();
 
-    var vault = vaultService.GetUserVault(user.Id);
-    Console.WriteLine($"User Vault: {vault.Id}");
+    Console.WriteLine($"Encrypting for user {signInDto.Email}");
 
-    createVaultNoteDto.UserId = user.Id;
-    createVaultLoginDto.UserId = user.Id;
+    var salt = KeyDerivationService.GenerateSalt(16);
+    var encryptionKey = keyDerivationService.GenerateKey(signInDto.MasterPassword, salt);
 
-    var vaultNote = vaultNoteService.Create(createVaultNoteDto);
-    Console.WriteLine($"Vault Note: {vaultNote.Id}");
+    Console.WriteLine("Initialised encryption key");
 
-    var vaultLogin = vaultLoginService.Create(createVaultLoginDto);
-    Console.WriteLine($"Vault Login: {vaultLogin.Id}");
+    var aes = Aes.Create();
+    aes.Key = encryptionKey;
 
-    var randomPassword = vaultLoginService.GeneratePassword(
-        new GeneratePasswordDto
-        {
-            Length = 8,
-            IncludeLowercase = true,
-            IncludeUppercase = false,
-            IncludeNumeric = false,
-            IncludeSpecial = false
-        }
-    );
+    encryptionService.Initialise(encryptionKey, aes.IV);
 
-    Console.WriteLine($"Random Password: {randomPassword}");
+    Console.WriteLine("Initialised encryption service");
 
+    var encrypted = encryptionService.EncryptString(signInDto.Email);
+
+    Console.WriteLine("Encrypted user email");
+
+    vaultContext.UserKeyMetadata.Add(new Database.Models.UserKeyMetadata()
+    {
+        Email = signInDto.Email,
+        Salt = salt,
+        IV = aes.IV
+    });
+    vaultContext.SaveChanges();
+
+    var metadataCount = vaultContext.UserKeyMetadata.Count(x => x.Salt == salt && x.IV == aes.IV);
+
+    Console.WriteLine($"count from db metadata {metadataCount}");
+
+    var metadata = vaultContext.UserKeyMetadata.SingleOrDefault(x => x.Email == signInDto.Email);
+    if (metadata == null)
+    {
+        throw new ArgumentException("Decryption error");
+    }
+
+    var decryptionKey = keyDerivationService.GenerateKey(signInDto.MasterPassword, metadata.Salt);
+
+    Console.WriteLine("Initialised decryption key");
+
+    encryptionService.Initialise(decryptionKey, metadata.IV);
+
+    var decrypted = encryptionService.DecryptString(encrypted);
+
+    Console.WriteLine($"Decrypted user email {decrypted}");
 }
 catch (Exception e)
 {

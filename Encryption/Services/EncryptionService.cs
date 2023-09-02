@@ -4,11 +4,21 @@ namespace Encryption.Services;
 
 public class EncryptionService
 {
-    private readonly byte[] _key;
-    private readonly byte[] _iv;
+    private byte[]? _key;
+    private byte[]? _iv;
 
 
     public EncryptionService(byte[] key, byte[] iv)
+    {
+        Initialise(key, iv);
+    }
+
+
+    public EncryptionService()
+    {
+    }
+
+    public void Initialise(byte[] key, byte[] iv)
     {
         _key = key;
         _iv = iv;
