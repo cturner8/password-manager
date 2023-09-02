@@ -12,31 +12,34 @@
 }
 else
 {
-    <h1 class="font-bold my-8">Logins (@logins.Count())</h1>
-    <NavLink href="logins/create">
-        New Login
-    </NavLink>
-    <table class="w-full">
-        <thead class="font-medium">
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Description</th>
-                <th scope="col">URL</th>
-                <th scope="col">Email</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var login in logins)
-            {
+    <Header Text="Logins">
+        <NavLink href="logins/create">
+            <Button Text="New Login" />
+        </NavLink>
+    </Header>
+    <div class="overflow-y-auto h-full">
+        <table class="table-auto w-full border-separate border-spacing-y-4">
+            <thead class="font-medium text-left tracking-wider">
                 <tr>
-                    <td>@login.Name</td>
-                    <td>@login.Description</td>
-                    <td>@login.URL</td>
-                    <td>@login.Email</td>
+                    <th class="p-3 text-left">Name</th>
+                    <th class="p-3 text-left">Description</th>
+                    <th class="p-3 text-left">URL</th>
+                    <th class="p-3 text-left">Email</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody class="">
+                @foreach (var login in logins)
+                {
+                    <tr class="bg-white">
+                        <td class="p-3 rounded-l-md">@login.Name</td>
+                        <td class="p-3">@login.Description</td>
+                        <td class="p-3">@login.URL</td>
+                        <td class="p-3 rounded-r-md">@login.Email</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {

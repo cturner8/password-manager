@@ -37,7 +37,7 @@ namespace PasswordManager
             builder.Logging.AddDebug();
 #endif
 
-            builder.Services.AddSingleton<VaultContext>();
+            builder.Services.AddDbContextFactory<VaultContext>();
 
             builder.Services.AddSingleton<VaultService>();
             builder.Services.AddSingleton<VaultLoginService>();

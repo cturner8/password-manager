@@ -13,7 +13,7 @@ public class VaultContext : DbContext
 
     public string DbPath { get; }
 
-    public VaultContext()
+    public VaultContext(DbContextOptions<VaultContext> options) : base(options)
     {
         var folder = Environment.SpecialFolder.LocalApplicationData;
         var path = Environment.GetFolderPath(folder);

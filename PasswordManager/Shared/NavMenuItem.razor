@@ -1,0 +1,21 @@
+﻿<div class="px-3">
+    <NavLink class="inline-block py-2 px-4 no-underline w-full flex flex-row" href="@Href" Match="@Match" ActiveClass="bg-primary rounded-md">
+        <img alt="@Alt" src="@IconPath" class="text-neutral w-6 h-6 mr-3" />
+        <span>
+            @Title
+        </span>
+    </NavLink>
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Href { get; set; }
+    [Parameter]
+    public string Alt { get; set; }
+    [Parameter]
+    public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
+    [Parameter]
+    public string IconPath { get; set; }
+}
