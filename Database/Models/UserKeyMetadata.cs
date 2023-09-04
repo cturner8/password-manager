@@ -2,11 +2,11 @@
 
 namespace Database.Models;
 
-[Index(nameof(Email))]
+[Index(nameof(Email), IsUnique = true)]
 public class UserKeyMetadata
 {
     public Guid Id { get; set; }
-    public required string Email { get; set; }
+    public required byte[] Email { get; set; }
     public required byte[] Salt { get; set; }
     public required byte[] IV { get; set; }
 }
