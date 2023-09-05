@@ -40,27 +40,27 @@ public class UserService
     {
         try
         {
-           var userKeyMetadata = _userEncryptionService.GenerateUserKeyMetadata(dto.Email);
+            var userKeyMetadata = _userEncryptionService.GenerateUserKeyMetadata(dto.Email);
             var key = InitialiseEncryption(dto.MasterPassword, userKeyMetadata.Salt, userKeyMetadata.IV);
 
             var user = new User()
             {
-                Email = _encryptionService.EncryptString(dto.Email) ,
+                Email = _encryptionService.EncryptString(dto.Email),
                 Firstname = _encryptionService.EncryptString(dto.Firstname),
                 Surname = _encryptionService.EncryptString(dto.Surname),
                 Vaults = new List<Vault>() { },
-                CreatedDate = DateTime.UtcNow,
-                UpdatedDate = DateTime.UtcNow,
+                CreatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
+                UpdatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
             };
 
             var userVault = new Vault()
             {
-                Name = "My Vault",
+                Name = _encryptionService.EncryptString("My Vault"),
                 Logins = new List<VaultLogin>(),
                 Notes = new List<VaultNote>(),
                 User = user,
-                CreatedDate = DateTime.UtcNow,
-                UpdatedDate = DateTime.UtcNow,
+                CreatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
+                UpdatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
                 Active = true
             };
 
@@ -82,20 +82,13 @@ public class UserService
     {
         var emailHash = UserEncryptionService.GenerateUserHash(dto.Email);
 
-        var userKeyMetadata = _vaultContext.UserKeyMetadata.Where(x => x.Email == emailHash).SingleOrDefault();
-        if (userKeyMetadata == null)
-        {
-            throw new SignInException();
-        }
-
+        var userKeyMetadata = _vaultContext.UserKeyMetadata.Where(x => x.Email == emailHash).SingleOrDefault() ?? throw new SignInException();
         var key = InitialiseEncryption(dto.MasterPassword, userKeyMetadata.Salt, userKeyMetadata.IV);
         var encryptedEmail = _encryptionService.EncryptString(dto.Email);
 
-        var user = _vaultContext.Users.Where(x => x.Email == encryptedEmail).SingleOrDefault();
-        if (user == null)
-        {
-            throw new SignInException();
-        }
+        var user = _vaultContext.Users
+            .Where(x => x.Email == encryptedEmail)
+            .SingleOrDefault() ?? throw new SignInException();
 
         return user;
     }

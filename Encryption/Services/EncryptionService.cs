@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using Encryption.Exceptions;
 
 namespace Encryption.Services;
 
@@ -97,6 +98,24 @@ public class EncryptionService
 
         // Return the decrypted plaintext from the memory stream.
         return plaintext;
+    }
+
+    public byte[] EncryptDateTime(DateTime dateTime)
+    {
+        var plainText = dateTime.ToString();
+        return EncryptString(plainText);
+    }
+
+
+    public DateTime DecryptDateTime(byte[] cipherText)
+    {
+        var plainText = DecryptString(cipherText);
+        var parsed = DateTime.TryParse(plainText, out var dateTime);
+        if (parsed)
+        {
+            return dateTime;
+        }
+        throw new DecryptionException("DateTime");
     }
 }
 

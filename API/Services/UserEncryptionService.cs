@@ -9,42 +9,43 @@ namespace API.Services;
 
 public class UserEncryptionService
 {
-	private readonly KeyDerivationService _keyDerivationService;
-	private readonly VaultContext _vaultContext;
+    private readonly KeyDerivationService _keyDerivationService;
+    private readonly VaultContext _vaultContext;
 
 
-	public UserEncryptionService(KeyDerivationService	keyDerivationService, VaultContext vaultContext)
-	{
-		_keyDerivationService = keyDerivationService;
-		_vaultContext = vaultContext;
-	}
+    public UserEncryptionService(KeyDerivationService keyDerivationService, VaultContext vaultContext)
+    {
+        _keyDerivationService = keyDerivationService;
+        _vaultContext = vaultContext;
+    }
 
-	public byte[] GenerateUserKey(string password, byte[] salt)
-	{
+    public byte[] GenerateUserKey(string password, byte[] salt)
+    {
         return _keyDerivationService.GenerateKey(password, salt);
     }
 
-	public UserKeyMetadata GenerateUserKeyMetadata(string email)
-	{
+    public UserKeyMetadata GenerateUserKeyMetadata(string email)
+    {
         var aes = Aes.Create();
         var salt = KeyDerivationService.GenerateSalt(16);
 
-		var emailHash = GenerateUserHash(email);
+        var emailHash = GenerateUserHash(email);
 
-		var userKeyMetadata = new UserKeyMetadata() {
-			Email = emailHash,
-			Salt = salt,
-			IV = aes.IV
-		};
+        var userKeyMetadata = new UserKeyMetadata()
+        {
+            Email = emailHash,
+            Salt = salt,
+            IV = aes.IV
+        };
 
-		_vaultContext.UserKeyMetadata.Add(userKeyMetadata);
-		_vaultContext.SaveChanges();
+        _vaultContext.UserKeyMetadata.Add(userKeyMetadata);
+        _vaultContext.SaveChanges();
 
-		return userKeyMetadata;
+        return userKeyMetadata;
     }
 
-	public static byte[] GenerateUserHash(string email)
-	{
+    public static byte[] GenerateUserHash(string email)
+    {
         var emailBytes = Encoding.ASCII.GetBytes(email);
         return MD5.HashData(emailBytes);
     }

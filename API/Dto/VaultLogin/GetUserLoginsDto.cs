@@ -1,6 +1,7 @@
-﻿namespace API.Dto.VaultLogin;
+﻿using API.Dto.Vault;
 
-public class GetUserLoginsDto
+namespace API.Dto.VaultLogin;
+
+public class GetUserLoginsDto : UserVaultDto
 {
-    public Guid UserId { get; set; }
 }
