@@ -1,5 +1,5 @@
-﻿using System.Security.Cryptography;
-using Encryption.Exceptions;
+﻿using Encryption.Exceptions;
+using System.Security.Cryptography;
 
 namespace Encryption.Services;
 

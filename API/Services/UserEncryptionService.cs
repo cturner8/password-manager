@@ -1,8 +1,8 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using Database.Context;
+﻿using Database.Context;
 using Database.Models;
 using Encryption.Services;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace API.Services;
 
