@@ -1,6 +1,10 @@
-﻿<button type="button" class="bg-primary rounded-md px-5 py-2 text-neutral w-36">@Text</button>
+﻿<button type="@Type" class="bg-primary rounded-md px-5 py-2 text-neutral w-52" onclick="@OnClick">@Text</button>
 
 @code {
     [Parameter]
     public string Text { get; set; }
+    [Parameter]
+    public string Type { get; set; } = "button";
+    [Parameter]
+    public EventCallback<System.EventArgs> OnClick { get; set; }
 }
