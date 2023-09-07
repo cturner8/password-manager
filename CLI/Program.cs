@@ -4,8 +4,9 @@ using API.Dto.VaultNote;
 using API.Services;
 using Bogus;
 using Database.Context;
+using Microsoft.EntityFrameworkCore;
 
-var vaultContext = new VaultContext();
+var vaultContext = new VaultContext(new DbContextOptions<VaultContext> { });
 
 var userService = new UserService(vaultContext);
 var vaultService = new VaultService(vaultContext);

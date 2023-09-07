@@ -2,6 +2,7 @@
 
 @using API.Services;
 @using Database.Models;
+@using PasswordManager.Shared.Table
 
 @inject VaultNoteService VaultNoteService
 
@@ -12,25 +13,28 @@
 }
 else
 {
-    <h1 class="font-bold my-8">Notes (@notes.Count())</h1>
-    <NavLink href="notes/create">
-        New Note
-    </NavLink>
-    <table class="w-full">
-        <thead class="font-medium">
-            <tr>
-                <th class="text-left">Name</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var note in notes)
-            {
-                <tr>
-                    <td>@note.Name</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <Header Text="Notes">
+        <NavLink href="notes/create">
+            <Button Text="New Note" />
+        </NavLink>
+    </Header>
+     <div>
+        <Table>
+            <TableHead>
+                <TableRow>
+                    <TableHeader>Name</TableHeader>
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                @foreach (var note in notes)
+                {
+                    <TableRow Color="bg-white">
+                        <TableCell RoundDirection="l">@note.Name</TableCell>
+                    </TableRow>
+                }
+            </TableBody>
+        </Table>
+    </div>
 }
 
 @code {

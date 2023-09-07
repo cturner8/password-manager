@@ -3,6 +3,7 @@
 
 @using API.Services;
 @using Database.Models;
+@using PasswordManager.Shared.Table
 
 @inject VaultLoginService VaultLoginService
 
@@ -12,31 +13,34 @@
 }
 else
 {
-    <h1 class="font-bold my-8">Logins (@logins.Count())</h1>
-    <NavLink href="logins/create">
-        New Login
-    </NavLink>
-    <table class="w-full">
-        <thead class="font-medium">
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Description</th>
-                <th scope="col">URL</th>
-                <th scope="col">Email</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var login in logins)
-            {
-                <tr>
-                    <td>@login.Name</td>
-                    <td>@login.Description</td>
-                    <td>@login.URL</td>
-                    <td>@login.Email</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <Header Text="Logins">
+        <NavLink href="logins/create">
+            <Button Text="New Login" />
+        </NavLink>
+    </Header>
+    <div>
+        <Table>
+            <TableHead>
+                <TableRow>
+                    <TableHeader>Name</TableHeader>
+                    <TableHeader>Description</TableHeader>
+                    <TableHeader>URL</TableHeader>
+                    <TableHeader>Email</TableHeader>
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                @foreach (var login in logins)
+                {
+                    <TableRow Color="bg-white">
+                        <TableCell RoundDirection="l">@login.Name</TableCell>
+                        <TableCell>@login.Description</TableCell>
+                        <TableCell>@login.URL</TableCell>
+                        <TableCell RoundDirection="r">@login.Email</TableCell>
+                    </TableRow>
+                }
+            </TableBody>
+        </Table>
+    </div>
 }
 
 @code {

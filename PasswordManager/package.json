@@ -1,0 +1,16 @@
+{
+  "name": "passwordmanager",
+  "version": "0.0.1",
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.6",
+    "@tailwindcss/typography": "^0.5.9",
+    "tailwindcss": "^3.3.3"
+  },
+  "scripts": {
+    "css": "tailwindcss -i ./wwwroot/css/app.css -o ./wwwroot/dist/app.css",
+    "css:watch": "yarn css --watch"
+  }
+}
