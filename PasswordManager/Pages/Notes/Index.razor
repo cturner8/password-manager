@@ -38,10 +38,14 @@ else
 }
 
 @code {
-    private IEnumerable<VaultNote> notes;
+    private IEnumerable<VaultNoteSummaryDto> notes;
 
     protected override void OnInitialized()
     {
-        notes = VaultNoteService.GetAll();
+        var dto = new GetUserVaultNotesDto()
+            {
+                UserId = Guid.Parse("ED8AAE48-E379-43B5-BADC-EE1627B6361A"), // TODO
+            };
+        notes = VaultNoteService.GetAll(dto);
     }
 }

@@ -1,0 +1,45 @@
+﻿@page "/auth/signin"
+
+
+<Header Text="Sign In" />
+
+<EditForm Model="@Model" OnSubmit="@Submit" class="flex flex-col gap-1">
+
+    <label for="email">
+        Email:<br>
+        <InputText @bind-Value="Model!.Email" id="email" class="rounded-md focus:border-primary outline-none" />
+    </label>
+
+    <label for="masterPassword">
+        Master Password:<br>
+        <InputText @bind-Value="Model!.MasterPassword" id="masterPassword" type="password" class="rounded-md focus:border-primary outline-none" />
+    </label>
+
+    <Button Text="Submit" Type="submit" />
+    <NavLink href="auth/signup">
+        <Button Text="Sign Up" />
+    </NavLink>
+</EditForm>
+
+@code {
+    public SignInModel Model { get; set; }
+
+    protected override void OnInitialized()
+    {
+        InitialiseModel();
+    }
+
+    private void InitialiseModel()
+    {
+        Model = new()
+        {
+            Email = "",
+            MasterPassword = ""
+        };
+    }
+
+    private void Submit()
+    {
+        InitialiseModel();
+    }
+}

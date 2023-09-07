@@ -1,0 +1,76 @@
+﻿@page "/auth/signup"
+@using API.Dto.User;
+
+@inject ILogger<SignUp> Logger
+@inject UserService UserService
+
+
+<Header Text="Sign Up" />
+
+<EditForm Model="@Model" OnSubmit="@Submit" class="flex flex-col gap-1">
+
+    <label for="firstname">
+        Firstname:<br>
+        <InputText @bind-Value="Model!.Firstname" id="firstname" class="rounded-md focus:border-primary outline-none" />
+    </label>
+
+
+    <label for="surname">
+        Surname:<br>
+        <InputText @bind-Value="Model!.Surname" id="surname" class="rounded-md focus:border-primary outline-none" />
+    </label>
+
+    <label for="email">
+        Email:<br>
+        <InputText @bind-Value="Model!.Email" id="email" class="rounded-md focus:border-primary outline-none" />
+    </label>
+
+    <label for="masterPassword">
+        Master Password:<br>
+        <InputText @bind-Value="Model!.MasterPassword" id="masterPassword" type="password" class="rounded-md focus:border-primary outline-none" />
+    </label>
+
+    <Button Text="Submit" Type="submit" />
+    <NavLink href="auth/signin">
+        <Button Text="Sign In" />
+    </NavLink>
+</EditForm>
+
+@code {
+    public SignUpModel Model { get; set; }
+
+    protected override void OnInitialized()
+    {
+        InitialiseModel();
+    }
+
+    private void InitialiseModel()
+    {
+        Model = new()
+        {
+            Email = "",
+            MasterPassword = "",
+            Firstname = "",
+            Surname = ""
+        };
+    }
+
+    private void Submit()
+    {
+        Logger.LogInformation("Submitting sign up request");
+
+        var dto = new SignUpDto()
+        {
+            Email = Model.Email,
+            MasterPassword = Model.MasterPassword,
+            Firstname = Model.Firstname,
+            Surname = Model.Surname
+        };
+
+        var user = UserService.SignUp(dto);
+
+        Logger.LogInformation($"Signed user up: {user.Id}");
+
+        InitialiseModel();
+    }
+}

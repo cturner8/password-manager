@@ -14,7 +14,8 @@ public class VaultContext : DbContext
 
     public string DbPath { get; }
 
-    public VaultContext(DbContextOptions<VaultContext> options) : base(options)
+    public VaultContext(DbContextOptions<VaultContext> options)
+        : base(options)
     {
         var folder = Environment.SpecialFolder.LocalApplicationData;
         var path = Environment.GetFolderPath(folder);
@@ -22,5 +23,14 @@ public class VaultContext : DbContext
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseSqlite($"Data Source={DbPath}");
+    {
+#if DEBUG
+        options
+        .UseSqlite($"Data Source={DbPath}")
+        .EnableSensitiveDataLogging();
+#else
+        options
+        .UseSqlite($"Data Source={DbPath}");
+#endif
+    }
 }

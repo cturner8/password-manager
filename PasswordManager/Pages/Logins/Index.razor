@@ -44,10 +44,14 @@ else
 }
 
 @code {
-    private IEnumerable<VaultLogin> logins;
+    private IEnumerable<VaultLoginSummaryDto> logins;
 
     protected override void OnInitialized()
     {
-        logins = VaultLoginService.GetAll();
+        var dto = new GetUserLoginsDto()
+        {
+            UserId = Guid.Parse("ED8AAE48-E379-43B5-BADC-EE1627B6361A"), // TODO
+        };
+        logins = VaultLoginService.GetAll(dto);
     }
 }

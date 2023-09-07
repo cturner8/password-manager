@@ -1,5 +1,6 @@
 ﻿using API.Services;
 using Database.Context;
+using Encryption.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -37,23 +38,34 @@ namespace PasswordManager
             builder.Logging.AddDebug();
 #endif
 
+            builder.Services.AddLogging();
+
+            builder.Logging
+                    .SetMinimumLevel(appSettings.GetValue<LogLevel>("Logging:LogLevel:Default"))
+                    .AddFilter("Microsoft", appSettings.GetValue<LogLevel>("Logging:LogLevel:Microsoft"))
+                    .AddFilter("System", appSettings.GetValue<LogLevel>("Logging:LogLevel:System"));
+
             builder.Services.AddDbContextFactory<VaultContext>();
+
+            var keyDerivationPreferences = new KeyDerivationPreferences()
+            {
+                Iterations = 600000
+            };
+
+            builder.Services.AddSingleton(sp => new KeyDerivationService(
+                keyDerivationPreferences.Iterations,
+                keyDerivationPreferences.HashAlgorithm,
+                keyDerivationPreferences.KeySize
+            ));
+
+            builder.Services.AddSingleton<EncryptionService>();
+            builder.Services.AddSingleton<UserEncryptionService>();
+
+            builder.Services.AddSingleton<UserService>();
 
             builder.Services.AddSingleton<VaultService>();
             builder.Services.AddSingleton<VaultLoginService>();
             builder.Services.AddSingleton<VaultNoteService>();
-
-
-            builder.Services.AddLogging();
-
-            var defaultLogLevel = appSettings.GetValue<LogLevel>("Logging:LogLevel:Default");
-            var microsoftLogLevel = appSettings.GetValue<LogLevel>("Logging:LogLevel:Microsoft");
-            var systemLogLevel = appSettings.GetValue<LogLevel>("Logging:LogLevel:System");
-
-            builder.Logging
-                    .SetMinimumLevel(defaultLogLevel)
-                    .AddFilter("Microsoft", microsoftLogLevel)
-                    .AddFilter("System", systemLogLevel);
 
             return builder.Build();
         }

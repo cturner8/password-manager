@@ -3,26 +3,31 @@ using API.Exceptions;
 using Database.Context;
 using Database.Models;
 using Encryption.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace API.Services;
 
 public class UserService
 {
-    private readonly VaultContext _vaultContext;
-    private readonly ILogger _logger;
+    //private readonly VaultContext _vaultContext;
+    private readonly ILogger<UserService> _logger;
     private readonly UserEncryptionService _userEncryptionService;
     private readonly EncryptionService _encryptionService;
 
+    private readonly IDbContextFactory<VaultContext> _contextFactory;
+
 
     public UserService(
-        VaultContext vaultContext,
-        ILogger logger,
+        //VaultContext vaultContext,
+        ILogger<UserService> logger,
         UserEncryptionService userEncryptionService,
-        EncryptionService encryptionService
+        EncryptionService encryptionService,
+        IDbContextFactory<VaultContext> contextFactory
         )
     {
-        _vaultContext = vaultContext;
+        //_vaultContext = vaultContext;
+        _contextFactory = contextFactory;
         _logger = logger;
         _userEncryptionService = userEncryptionService;
         _encryptionService = encryptionService;
@@ -40,6 +45,8 @@ public class UserService
     {
         try
         {
+            using var vaultContext = _contextFactory.CreateDbContext();
+
             var userKeyMetadata = _userEncryptionService.GenerateUserKeyMetadata(dto.Email);
             var key = InitialiseEncryption(dto.MasterPassword, userKeyMetadata.Salt, userKeyMetadata.IV);
 
@@ -64,10 +71,10 @@ public class UserService
                 Active = true
             };
 
-            _vaultContext.Users.Add(user);
+            vaultContext.Users.Add(user);
             user.Vaults.Add(userVault);
 
-            _vaultContext.SaveChanges();
+            vaultContext.SaveChanges();
 
             return user;
         }
@@ -80,13 +87,15 @@ public class UserService
 
     public User SignIn(SignInDto dto)
     {
+        using var vaultContext = _contextFactory.CreateDbContext();
+
         var emailHash = UserEncryptionService.GenerateUserHash(dto.Email);
 
-        var userKeyMetadata = _vaultContext.UserKeyMetadata.Where(x => x.Email == emailHash).SingleOrDefault() ?? throw new SignInException();
+        var userKeyMetadata = vaultContext.UserKeyMetadata.Where(x => x.Email == emailHash).SingleOrDefault() ?? throw new SignInException();
         var key = InitialiseEncryption(dto.MasterPassword, userKeyMetadata.Salt, userKeyMetadata.IV);
         var encryptedEmail = _encryptionService.EncryptString(dto.Email);
 
-        var user = _vaultContext.Users
+        var user = vaultContext.Users
             .Where(x => x.Email == encryptedEmail)
             .SingleOrDefault() ?? throw new SignInException();
 
