@@ -1,14 +1,25 @@
-﻿using System.Security.Cryptography;
+﻿using Encryption.Exceptions;
+using System.Security.Cryptography;
 
 namespace Encryption.Services;
 
 public class EncryptionService
 {
-    private readonly byte[] _key;
-    private readonly byte[] _iv;
+    private byte[]? _key;
+    private byte[]? _iv;
 
 
     public EncryptionService(byte[] key, byte[] iv)
+    {
+        Initialise(key, iv);
+    }
+
+
+    public EncryptionService()
+    {
+    }
+
+    public void Initialise(byte[] key, byte[] iv)
     {
         _key = key;
         _iv = iv;
@@ -87,6 +98,24 @@ public class EncryptionService
 
         // Return the decrypted plaintext from the memory stream.
         return plaintext;
+    }
+
+    public byte[] EncryptDateTime(DateTime dateTime)
+    {
+        var plainText = dateTime.ToString();
+        return EncryptString(plainText);
+    }
+
+
+    public DateTime DecryptDateTime(byte[] cipherText)
+    {
+        var plainText = DecryptString(cipherText);
+        var parsed = DateTime.TryParse(plainText, out var dateTime);
+        if (parsed)
+        {
+            return dateTime;
+        }
+        throw new DecryptionException("DateTime");
     }
 }
 

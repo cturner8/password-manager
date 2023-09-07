@@ -15,12 +15,9 @@ public class VaultService
 
     public Vault GetUserVault(Guid userId)
     {
-        var userVault = _vaultContext.Vaults.Where(x => x.UserId == userId).SingleOrDefault();
-        if (userVault == null)
-        {
-            throw new NotFoundException("Vault");
-        }
-
+        var userVault = _vaultContext.Vaults
+            .Where(x => x.UserId == userId)
+            .SingleOrDefault() ?? throw new NotFoundException("Vault");
         return userVault;
     }
 }

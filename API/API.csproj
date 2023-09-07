@@ -12,6 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Database\Database.csproj" />
+    <ProjectReference Include="..\Encryption\Encryption.csproj" />
   </ItemGroup>
-
 </Project>

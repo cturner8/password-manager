@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 public class VaultContext : DbContext
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<UserKeyMetadata> UserKeyMetadata { get; set; }
     public DbSet<Vault> Vaults { get; set; }
     public DbSet<VaultLogin> VaultLogins { get; set; }
     public DbSet<VaultNote> VaultNotes { get; set; }

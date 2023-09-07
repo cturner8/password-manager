@@ -1,6 +1,8 @@
 ﻿using API.Dto.VaultLogin;
+using API.Exceptions;
 using Database.Context;
 using Database.Models;
+using Encryption.Services;
 using PasswordGenerator;
 
 namespace API.Services;
@@ -9,11 +11,17 @@ public class VaultLoginService
 {
     private readonly VaultContext _vaultContext;
     private readonly VaultService _vaultService;
+    private readonly EncryptionService _encryptionService;
 
-    public VaultLoginService(VaultContext vaultContext, VaultService vaultService)
+
+    public VaultLoginService(VaultContext vaultContext, VaultService vaultService,
+        EncryptionService encryptionService
+
+        )
     {
         _vaultContext = vaultContext;
         _vaultService = vaultService;
+        _encryptionService = encryptionService;
     }
 
     public VaultLogin Create(CreateVaultLoginDto dto)
@@ -21,18 +29,18 @@ public class VaultLoginService
         Vault vault = _vaultService.GetUserVault(dto.UserId);
         var vaultLogin = new VaultLogin()
         {
-            Name = dto.Name,
-            Description = dto.Description,
-            Email = dto.Email,
-            Password = dto.Password,
-            URL = dto.URL,
-            Username = dto.Username,
-            Category = dto.Category,
-            Notes = dto.Notes,
+            Name = _encryptionService.EncryptString(dto.Name),
+            Description = dto.Description != null ? _encryptionService.EncryptString(dto.Description) : null,
+            Email = _encryptionService.EncryptString(dto.Email),
+            Password = _encryptionService.EncryptString(dto.Password),
+            URL = _encryptionService.EncryptString(dto.URL),
+            Username = dto.Username != null ? _encryptionService.EncryptString(dto.Username) : null,
+            Category = dto.Category != null ? _encryptionService.EncryptString(dto.Category) : null,
+            Notes = dto.Notes != null ? _encryptionService.EncryptString(dto.Notes) : null,
             Active = true,
             Vault = vault,
-            CreatedDate = DateTime.UtcNow,
-            UpdatedDate = DateTime.UtcNow,
+            CreatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
+            UpdatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
         };
 
         _vaultContext.VaultLogins.Add(vaultLogin);
@@ -41,12 +49,48 @@ public class VaultLoginService
         return vaultLogin;
     }
 
-    public IEnumerable<VaultLogin> GetAll()
+    public IEnumerable<VaultLoginSummaryDto> GetAll(GetUserLoginsDto dto)
     {
-        return _vaultContext.VaultLogins.AsEnumerable();
+        Vault vault = _vaultService.GetUserVault(dto.UserId);
+        return _vaultContext.VaultLogins
+            .Where(x => x.Vault == vault)
+            .Select(x => new VaultLoginSummaryDto()
+            {
+                Id = x.Id,
+                Email = _encryptionService.DecryptString(x.Email),
+                Name = _encryptionService.DecryptString(x.Name),
+                URL = _encryptionService.DecryptString(x.URL),
+                Description = x.Description != null ? _encryptionService.DecryptString(x.Description) : null,
+                CreatedDate = _encryptionService.DecryptDateTime(x.CreatedDate),
+                UpdatedDate = _encryptionService.DecryptDateTime(x.UpdatedDate)
+            });
     }
 
-    public string GeneratePassword(GeneratePasswordDto dto)
+    public VaultLoginDetailsDto Get(GetVaultLoginDto dto)
+    {
+        Vault vault = _vaultService.GetUserVault(dto.UserId);
+        var vaultLoginDetails = _vaultContext.VaultLogins
+            .Where(x => x.Vault == vault && x.Id == dto.Id)
+            .Select(x => new VaultLoginDetailsDto()
+            {
+                Id = x.Id,
+                Name = _encryptionService.DecryptString(x.Name),
+                Description = x.Description != null ? _encryptionService.DecryptString(x.Description) : null,
+                Email = _encryptionService.DecryptString(x.Email),
+                Password = _encryptionService.DecryptString(x.Password),
+                URL = _encryptionService.DecryptString(x.URL),
+                Username = x.Username != null ? _encryptionService.DecryptString(x.Username) : null,
+                Category = x.Category != null ? _encryptionService.DecryptString(x.Category) : null,
+                Notes = x.Notes != null ? _encryptionService.DecryptString(x.Notes) : null,
+                CreatedDate = _encryptionService.DecryptDateTime(x.CreatedDate),
+                UpdatedDate = _encryptionService.DecryptDateTime(x.UpdatedDate)
+            })
+            .SingleOrDefault() ?? throw new NotFoundException("VaultLogin");
+
+        return vaultLoginDetails;
+    }
+
+    public static string GeneratePassword(GeneratePasswordDto dto)
     {
         var password = new Password(
             includeLowercase: dto.IncludeLowercase,

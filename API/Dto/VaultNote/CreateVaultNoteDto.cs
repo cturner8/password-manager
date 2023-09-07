@@ -1,8 +1,9 @@
-﻿namespace API.Dto.VaultNote;
+﻿using API.Dto.Vault;
 
-public class CreateVaultNoteDto
+namespace API.Dto.VaultNote;
+
+public class CreateVaultNoteDto : UserVaultDto
 {
-    public Guid UserId { get; set; }
     public required string Name { get; set; }
     public required string Note { get; set; }
     public string? Description { get; set; }

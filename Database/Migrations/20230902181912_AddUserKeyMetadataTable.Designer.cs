@@ -3,6 +3,7 @@ using System;
 using Database.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Database.Migrations
 {
     [DbContext(typeof(VaultContext))]
-    partial class VaultContextModelSnapshot : ModelSnapshot
+    [Migration("20230902181912_AddUserKeyMetadataTable")]
+    partial class AddUserKeyMetadataTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.10");
@@ -26,28 +29,26 @@ namespace Database.Migrations
                     b.Property<Guid>("CreatedById")
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("CreatedDate")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Email")
+                    b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Firstname")
+                    b.Property<string>("Firstname")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Surname")
+                    b.Property<string>("Surname")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("UpdatedById")
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("UpdatedDate")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -60,9 +61,9 @@ namespace Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Email")
+                    b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
                     b.Property<byte[]>("IV")
                         .IsRequired()
@@ -73,9 +74,6 @@ namespace Database.Migrations
                         .HasColumnType("BLOB");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
 
                     b.ToTable("UserKeyMetadata");
                 });
@@ -92,20 +90,18 @@ namespace Database.Migrations
                     b.Property<Guid>("CreatedById")
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("CreatedDate")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Name")
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("UpdatedById")
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("UpdatedDate")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
@@ -126,47 +122,45 @@ namespace Database.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("INTEGER");
 
-                    b.Property<byte[]>("Category")
-                        .HasColumnType("BLOB");
+                    b.Property<string>("Category")
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("CreatedById")
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("CreatedDate")
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Description")
-                        .HasColumnType("BLOB");
-
-                    b.Property<byte[]>("Email")
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Name")
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Notes")
-                        .HasColumnType("BLOB");
-
-                    b.Property<byte[]>("Password")
+                    b.Property<string>("URL")
                         .IsRequired()
-                        .HasColumnType("BLOB");
-
-                    b.Property<byte[]>("URL")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("UpdatedById")
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("UpdatedDate")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Username")
-                        .HasColumnType("BLOB");
+                    b.Property<string>("Username")
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("VaultId")
                         .HasColumnType("TEXT");
@@ -190,27 +184,25 @@ namespace Database.Migrations
                     b.Property<Guid>("CreatedById")
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("CreatedDate")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Description")
-                        .HasColumnType("BLOB");
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Name")
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Note")
+                    b.Property<string>("Note")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("UpdatedById")
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("UpdatedDate")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("VaultId")
                         .HasColumnType("TEXT");
