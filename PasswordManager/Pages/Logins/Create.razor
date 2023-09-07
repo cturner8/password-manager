@@ -4,52 +4,53 @@
 @inject VaultLoginService VaultLoginService
 
 
-<h1 class="font-bold my-8">New Login</h1>
+<Header Text="New Login" />
 
-<EditForm Model="@Model" OnSubmit="@Submit">
+<EditForm Model="@Model" OnSubmit="@Submit" class="flex flex-col gap-1">
 
     <label for="name">
         Name:<br>
-        <InputText @bind-Value="Model!.Name" id="name" />
-    </label><br>
+        <InputText @bind-Value="Model!.Name" id="name" class="rounded-md focus:border-primary outline-none" />
+    </label>
 
     <label for="description">
         Description:<br>
-        <InputTextArea @bind-Value="Model!.Description" id="description" />
-    </label><br>
+        <InputTextArea @bind-Value="Model!.Description" id="description" class="rounded-md focus:border-primary outline-none" />
+    </label>
 
     <label for="url">
         URL:<br>
-        <InputText @bind-Value="Model!.URL" id="url" />
-    </label><br>
+        <InputText @bind-Value="Model!.URL" id="url" class="rounded-md focus:border-primary outline-none" />
+    </label>
 
     <label for="email">
         Email:<br>
-        <InputText @bind-Value="Model!.Email" type="email" id="email" />
-    </label><br>
+        <InputText @bind-Value="Model!.Email" type="email" id="email" class="rounded-md focus:border-primary outline-none" />
+    </label>
 
     <label for="username">
         Username:<br>
-        <InputText @bind-Value="Model!.Username" id="username" />
-    </label><br>
+        <InputText @bind-Value="Model!.Username" id="username" class="rounded-md focus:border-primary outline-none" />
+    </label>
 
     <label for="password">
         Password:<br>
-        <InputText @bind-Value="Model!.Password" type="password" id="password" />
-    </label><br>
+        <InputText @bind-Value="Model!.Password" type="password" id="password" class="rounded-md focus:border-primary outline-none" />
+    </label>
+    <Button Text="Generate Password" OnClick="@GeneratePassword" />
 
     <label for="notes">
         Notes:<br>
-        <InputTextArea @bind-Value="Model!.Notes" id="notes"  />
-    </label><br>
+        <InputTextArea @bind-Value="Model!.Notes" id="notes" class="rounded-md focus:border-primary outline-none" />
+    </label>
 
 
     <label for="category">
         Category:<br>
-        <InputText @bind-Value="Model!.Category" id="category" />
-    </label><br>
+        <InputText @bind-Value="Model!.Category" id="category" class="rounded-md focus:border-primary outline-none" />
+    </label>
   
-    <button type"submit">Save</button>
+    <Button Text="Save" Type="submit" />
 </EditForm>
 
 @code {
@@ -96,5 +97,13 @@
         Logger.LogInformation($"Created vault login: {vaultLogin.Id}");
 
         InitialiseModel();
+    }
+
+    private void GeneratePassword(EventArgs e)
+    {
+        var dto = new GeneratePasswordDto();
+        var password = VaultLoginService.GeneratePassword(dto);
+
+        Model.Password = password;
     }
 }

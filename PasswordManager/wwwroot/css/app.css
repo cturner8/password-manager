@@ -1,12 +1,39 @@
-﻿@font-face {
-    font-family: 'Open Sans Regular';
-    src: url('../assets/fonts/OpenSans-Regular.ttf') format('truetype');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Open Sans Regular";
+  src: url("../assets/fonts/OpenSans-Regular.ttf") format("truetype");
 }
 
-html, body {
-    font-family: 'Open Sans Regular', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+html,
+body {
+  font-family: "Open Sans Regular", "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
 }
 
 #blazor-error-ui {
-    display: none;
+  display: none;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }

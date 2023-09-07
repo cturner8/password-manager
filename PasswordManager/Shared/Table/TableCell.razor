@@ -1,0 +1,11 @@
+﻿<td class="p-3@(RoundedCssClass)">@ChildContent</td>
+
+@code {
+    // rounded prop
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public string RoundDirection { get; set; } = "";
+
+    private string RoundedCssClass => RoundDirection != "" ? $" rounded-{RoundDirection}-md" : null;
+}

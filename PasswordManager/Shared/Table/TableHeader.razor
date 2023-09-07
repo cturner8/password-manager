@@ -1,0 +1,8 @@
+﻿<th class="p-3 text-left">
+    @ChildContent
+</th>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}
