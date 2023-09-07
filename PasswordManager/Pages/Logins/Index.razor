@@ -3,6 +3,7 @@
 
 @using API.Services;
 @using Database.Models;
+@using PasswordManager.Shared.Table
 
 @inject VaultLoginService VaultLoginService
 
@@ -18,27 +19,27 @@ else
         </NavLink>
     </Header>
     <div>
-        <table class="table-auto w-full border-separate border-spacing-y-4">
-            <thead class="font-medium text-left tracking-wider">
-                <tr>
-                    <th class="p-3 text-left">Name</th>
-                    <th class="p-3 text-left">Description</th>
-                    <th class="p-3 text-left">URL</th>
-                    <th class="p-3 text-left">Email</th>
-                </tr>
-            </thead>
-            <tbody class="">
+        <Table>
+            <TableHead>
+                <TableRow>
+                    <TableHeader>Name</TableHeader>
+                    <TableHeader>Description</TableHeader>
+                    <TableHeader>URL</TableHeader>
+                    <TableHeader>Email</TableHeader>
+                </TableRow>
+            </TableHead>
+            <TableBody>
                 @foreach (var login in logins)
                 {
-                    <tr class="bg-white">
-                        <td class="p-3 rounded-l-md">@login.Name</td>
-                        <td class="p-3">@login.Description</td>
-                        <td class="p-3">@login.URL</td>
-                        <td class="p-3 rounded-r-md">@login.Email</td>
-                    </tr>
+                    <TableRow Color="bg-white">
+                        <TableCell RoundDirection="l">@login.Name</TableCell>
+                        <TableCell>@login.Description</TableCell>
+                        <TableCell>@login.URL</TableCell>
+                        <TableCell RoundDirection="r">@login.Email</TableCell>
+                    </TableRow>
                 }
-            </tbody>
-        </table>
+            </TableBody>
+        </Table>
     </div>
 }
 

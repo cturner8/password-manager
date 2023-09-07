@@ -1,0 +1,10 @@
+﻿<tr class="@Color drop-shadow-sm">
+    @ChildContent
+</tr>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public string Color { get; set; } = null;
+}

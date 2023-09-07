@@ -3,27 +3,27 @@
 @inject ILogger<Create> Logger
 @inject VaultNoteService VaultNoteService
 
+<Header Text="New Note" />
 
-<h1 class="font-bold my-8">New Note</h1>
-
-<EditForm Model="@Model" OnSubmit="@Submit">
+<EditForm Model="@Model" OnSubmit="@Submit" class="flex flex-col gap-1">
 
     <label for="name">
         Name:<br>
-        <InputText @bind-Value="Model!.Name" id="name" />
-    </label><br>
+        <InputText @bind-Value="Model!.Name" id="name" class="rounded-md focus:border-primary outline-none" />
+    </label>
 
     <label for="description">
         Description:<br>
-        <InputTextArea @bind-Value="Model!.Description" id="description" />
-    </label><br>
+        <InputTextArea @bind-Value="Model!.Description" id="description" class="rounded-md focus:border-primary outline-none" />
+    </label>
+
 
     <label for="note">
         Note:<br>
-        <InputTextArea @bind-Value="Model!.Note" id="note"  />
-    </label><br>
-  
-    <button type"submit">Save</button>
+        <InputTextArea @bind-Value="Model!.Note" id="note" class="rounded-md focus:border-primary outline-none" />
+    </label>
+
+    <Button Text="Save" Type="submit" />
 </EditForm>
 
 @code {

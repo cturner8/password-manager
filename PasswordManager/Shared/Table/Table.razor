@@ -1,0 +1,8 @@
+﻿<table class="table-auto w-full border-separate border-spacing-y-4">
+    @ChildContent
+</table>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}
