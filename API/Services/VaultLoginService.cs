@@ -3,29 +3,33 @@ using API.Exceptions;
 using Database.Context;
 using Database.Models;
 using Encryption.Services;
+using Microsoft.EntityFrameworkCore;
 using PasswordGenerator;
 
 namespace API.Services;
 
 public class VaultLoginService
 {
-    private readonly VaultContext _vaultContext;
     private readonly VaultService _vaultService;
     private readonly EncryptionService _encryptionService;
+    private readonly IDbContextFactory<VaultContext> _contextFactory;
 
 
-    public VaultLoginService(VaultContext vaultContext, VaultService vaultService,
-        EncryptionService encryptionService
-
+    public VaultLoginService(
+        VaultService vaultService,
+        EncryptionService encryptionService,
+        IDbContextFactory<VaultContext> contextFactory
         )
     {
-        _vaultContext = vaultContext;
+        _contextFactory = contextFactory;
         _vaultService = vaultService;
         _encryptionService = encryptionService;
     }
 
-    public VaultLogin Create(CreateVaultLoginDto dto)
+    public async Task<VaultLogin> Create(CreateVaultLoginDto dto)
     {
+        using var vaultContext = _contextFactory.CreateDbContext();
+
         Vault vault = _vaultService.GetUserVault(dto.UserId);
         var vaultLogin = new VaultLogin()
         {
@@ -43,16 +47,18 @@ public class VaultLoginService
             UpdatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
         };
 
-        _vaultContext.VaultLogins.Add(vaultLogin);
-        _vaultContext.SaveChanges();
+        vaultContext.VaultLogins.Add(vaultLogin);
+        await vaultContext.SaveChangesAsync();
 
         return vaultLogin;
     }
 
     public IEnumerable<VaultLoginSummaryDto> GetAll(GetUserLoginsDto dto)
     {
+        using var vaultContext = _contextFactory.CreateDbContext();
+
         Vault vault = _vaultService.GetUserVault(dto.UserId);
-        return _vaultContext.VaultLogins
+        return vaultContext.VaultLogins
             .Where(x => x.Vault == vault)
             .Select(x => new VaultLoginSummaryDto()
             {
@@ -68,8 +74,10 @@ public class VaultLoginService
 
     public VaultLoginDetailsDto Get(GetVaultLoginDto dto)
     {
+        using var vaultContext = _contextFactory.CreateDbContext();
+
         Vault vault = _vaultService.GetUserVault(dto.UserId);
-        var vaultLoginDetails = _vaultContext.VaultLogins
+        var vaultLoginDetails = vaultContext.VaultLogins
             .Where(x => x.Vault == vault && x.Id == dto.Id)
             .Select(x => new VaultLoginDetailsDto()
             {

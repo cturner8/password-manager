@@ -3,6 +3,7 @@ using Database.Context;
 using Encryption.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using PasswordManager.State;
 
 namespace PasswordManager
 {
@@ -43,6 +44,7 @@ namespace PasswordManager
             builder.Logging
                     .SetMinimumLevel(appSettings.GetValue<LogLevel>("Logging:LogLevel:Default"))
                     .AddFilter("Microsoft", appSettings.GetValue<LogLevel>("Logging:LogLevel:Microsoft"))
+                    .AddFilter("Microsoft.EntityFrameworkCore.Database.Command", appSettings.GetValue<LogLevel>("Logging:LogLevel:Microsoft.EntityFrameworkCore.Database.Command"))
                     .AddFilter("System", appSettings.GetValue<LogLevel>("Logging:LogLevel:System"));
 
             builder.Services.AddDbContextFactory<VaultContext>();
@@ -67,7 +69,11 @@ namespace PasswordManager
             builder.Services.AddSingleton<VaultLoginService>();
             builder.Services.AddSingleton<VaultNoteService>();
 
-            return builder.Build();
+            builder.Services.AddScoped<AuthStateContainer>();
+
+            var app = builder.Build();
+
+            return app;
         }
     }
 }

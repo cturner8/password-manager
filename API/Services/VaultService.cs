@@ -1,21 +1,25 @@
 ﻿using API.Exceptions;
 using Database.Context;
 using Database.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services;
 
 public class VaultService
 {
-    private readonly VaultContext _vaultContext;
+    private readonly IDbContextFactory<VaultContext> _contextFactory;
 
-    public VaultService(VaultContext vaultContext)
+
+    public VaultService(IDbContextFactory<VaultContext> contextFactory)
     {
-        _vaultContext = vaultContext;
+        _contextFactory = contextFactory;
     }
 
     public Vault GetUserVault(Guid userId)
     {
-        var userVault = _vaultContext.Vaults
+        using var vaultContext = _contextFactory.CreateDbContext();
+
+        var userVault = vaultContext.Vaults
             .Where(x => x.UserId == userId)
             .SingleOrDefault() ?? throw new NotFoundException("Vault");
         return userVault;

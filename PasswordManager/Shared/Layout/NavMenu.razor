@@ -1,36 +1,43 @@
-﻿
-<div class="ps-3 relative flex flex-wrap items-center content-between py-4 px-4 text-neutral">
-    <div class="container mx-auto sm:px-4 max-w-full mx-auto sm:px-4">
-        <a class="inline-block pt-1 pb-1 mr-4 text-lg whitespace-no-wrap" href="">PasswordManager</a>
+﻿@inherits AuthProvider
+
+@inject AuthStateContainer AuthStateContainer
+
+
+@if (AuthStateContainer.LoggedInUser != null)
+{
+    <div class="ps-3 relative flex flex-wrap items-center content-between py-4 px-4 text-neutral">
+        <div class="container mx-auto sm:px-4 max-w-full mx-auto sm:px-4">
+            <a class="inline-block pt-1 pb-1 mr-4 text-lg whitespace-no-wrap" href="">PasswordManager</a>
     
+        </div>
     </div>
-</div>
 
-<div>
-    <nav class="flex-col text-neutral grow">
-        <NavMenuItem
-            Title="Home"
-            Href=""
-            Alt="home"
-            IconPath="assets/images/home.svg"
-             Match="NavLinkMatch.All"
-        />
-        <NavMenuItem Title="Account"
-                     Href="account"
-                     Alt="account"
-                     IconPath="assets/images/account.svg" />
-        <NavMenuItem Title="Logins"
-                     Href="logins"
-                     Alt="logins"
-                     IconPath="assets/images/logins.svg" />
-        <NavMenuItem Title="Notes"
-                     Href="notes"
-                     Alt="notes"
-                     IconPath="assets/images/notes.svg" />
-        <NavMenuItem Title="Settings"
-                     Href="settings"
-                     Alt="settings"
-                     IconPath="assets/images/settings.svg" />
-    </nav>
-</div>
+    <div>
+        <nav class="flex-col text-neutral grow">
+            <NavMenuItem
+                Title="Home"
+                Href=""
+                Alt="home"
+                IconPath="assets/images/home.svg"
+                 Match="NavLinkMatch.All"
+            />
+            <NavMenuItem Title="Account"
+                         Href="account"
+                         Alt="account"
+                         IconPath="assets/images/account.svg" />
+            <NavMenuItem Title="Logins"
+                         Href="logins"
+                         Alt="logins"
+                         IconPath="assets/images/logins.svg" />
+            <NavMenuItem Title="Notes"
+                         Href="notes"
+                         Alt="notes"
+                         IconPath="assets/images/notes.svg" />
+            <NavMenuItem Title="Settings"
+                         Href="settings"
+                         Alt="settings"
+                         IconPath="assets/images/settings.svg" />
+        </nav>
+    </div>
 
+}

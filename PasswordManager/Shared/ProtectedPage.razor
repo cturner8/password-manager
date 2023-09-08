@@ -1,0 +1,14 @@
+﻿@inherits AuthProvider
+
+@inject NavigationManager Navigation
+@inject AuthStateContainer AuthStateContainer
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (AuthStateContainer.LoggedInUser == null)
+        {
+            Navigation.NavigateTo("/");
+        }
+    }
+}

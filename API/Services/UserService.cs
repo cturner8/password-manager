@@ -10,7 +10,6 @@ namespace API.Services;
 
 public class UserService
 {
-    //private readonly VaultContext _vaultContext;
     private readonly ILogger<UserService> _logger;
     private readonly UserEncryptionService _userEncryptionService;
     private readonly EncryptionService _encryptionService;
@@ -19,14 +18,12 @@ public class UserService
 
 
     public UserService(
-        //VaultContext vaultContext,
         ILogger<UserService> logger,
         UserEncryptionService userEncryptionService,
         EncryptionService encryptionService,
         IDbContextFactory<VaultContext> contextFactory
         )
     {
-        //_vaultContext = vaultContext;
         _contextFactory = contextFactory;
         _logger = logger;
         _userEncryptionService = userEncryptionService;
@@ -41,13 +38,13 @@ public class UserService
         return key;
     }
 
-    public User SignUp(SignUpDto dto)
+    public async Task<User> SignUp(SignUpDto dto)
     {
         try
         {
             using var vaultContext = _contextFactory.CreateDbContext();
 
-            var userKeyMetadata = _userEncryptionService.GenerateUserKeyMetadata(dto.Email);
+            var userKeyMetadata = await _userEncryptionService.GenerateUserKeyMetadata(dto.Email);
             var key = InitialiseEncryption(dto.MasterPassword, userKeyMetadata.Salt, userKeyMetadata.IV);
 
             var user = new User()
@@ -60,21 +57,21 @@ public class UserService
                 UpdatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
             };
 
-            var userVault = new Vault()
-            {
-                Name = _encryptionService.EncryptString("My Vault"),
-                Logins = new List<VaultLogin>(),
-                Notes = new List<VaultNote>(),
-                User = user,
-                CreatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
-                UpdatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
-                Active = true
-            };
+            // TODO
+            //var userVault = new Vault()
+            //{
+            //    Name = _encryptionService.EncryptString("My Vault"),
+            //    Logins = new List<VaultLogin>(),
+            //    Notes = new List<VaultNote>(),
+            //    CreatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
+            //    UpdatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
+            //    Active = true
+            //};
 
             vaultContext.Users.Add(user);
-            user.Vaults.Add(userVault);
+            //user.Vaults.Add(userVault);
 
-            vaultContext.SaveChanges();
+            await vaultContext.SaveChangesAsync();
 
             return user;
         }

@@ -3,29 +3,33 @@ using API.Exceptions;
 using Database.Context;
 using Database.Models;
 using Encryption.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services;
 
 public class VaultNoteService
 {
-    private readonly VaultContext _vaultContext;
     private readonly VaultService _vaultService;
     private readonly EncryptionService _encryptionService;
+    private readonly IDbContextFactory<VaultContext> _contextFactory;
 
 
-    public VaultNoteService(VaultContext vaultContext, VaultService vaultService,
-        EncryptionService encryptionService
+    public VaultNoteService(
+        VaultService vaultService,
+        EncryptionService encryptionService,
+        IDbContextFactory<VaultContext> contextFactory
 
-        )
+    )
     {
-        _vaultContext = vaultContext;
+        _contextFactory = contextFactory;
         _vaultService = vaultService;
         _encryptionService = encryptionService;
-
     }
 
-    public VaultNote Create(CreateVaultNoteDto dto)
+    public async Task<VaultNote> Create(CreateVaultNoteDto dto)
     {
+        using var vaultContext = _contextFactory.CreateDbContext();
+
         Vault vault = _vaultService.GetUserVault(dto.UserId);
         var vaultNote = new VaultNote()
         {
@@ -38,16 +42,18 @@ public class VaultNoteService
             UpdatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
         };
 
-        _vaultContext.VaultNotes.Add(vaultNote);
-        _vaultContext.SaveChanges();
+        vaultContext.VaultNotes.Add(vaultNote);
+        await vaultContext.SaveChangesAsync();
 
         return vaultNote;
     }
 
     public IEnumerable<VaultNoteSummaryDto> GetAll(GetUserVaultNotesDto dto)
     {
+        using var vaultContext = _contextFactory.CreateDbContext();
+
         Vault vault = _vaultService.GetUserVault(dto.UserId);
-        return _vaultContext.VaultNotes
+        return vaultContext.VaultNotes
             .Where(x => x.Vault == vault)
             .Select(x => new VaultNoteSummaryDto()
             {
@@ -60,8 +66,10 @@ public class VaultNoteService
 
     public VaultNoteDetailsDto Get(GetVaultNoteDto dto)
     {
+        using var vaultContext = _contextFactory.CreateDbContext();
+
         Vault vault = _vaultService.GetUserVault(dto.UserId);
-        var vaultNoteDetails = _vaultContext.VaultNotes
+        var vaultNoteDetails = vaultContext.VaultNotes
             .Where(x => x.Vault == vault && x.Id == dto.Id)
             .Select(x => new VaultNoteDetailsDto()
             {

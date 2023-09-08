@@ -55,7 +55,7 @@
         };
     }
 
-    private void Submit()
+    private async void Submit()
     {
         Logger.LogInformation("Submitting sign up request");
 
@@ -67,7 +67,7 @@
             Surname = Model.Surname
         };
 
-        var user = UserService.SignUp(dto);
+        var user = await UserService.SignUp(dto);
 
         Logger.LogInformation($"Signed user up: {user.Id}");
 

@@ -1,0 +1,14 @@
+﻿@inject AuthStateContainer AuthStateContainer
+@implements IDisposable
+
+@code {
+    protected override void OnInitialized()
+    {
+        AuthStateContainer.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        AuthStateContainer.OnChange -= StateHasChanged;
+    }
+}

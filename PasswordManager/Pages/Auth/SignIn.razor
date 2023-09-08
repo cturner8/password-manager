@@ -1,5 +1,10 @@
 ﻿@page "/auth/signin"
+@using API.Dto.User;
 
+@inject ILogger<SignIn> Logger
+@inject UserService UserService
+@inject NavigationManager Navigation
+@inject AuthStateContainer AuthStateContainer
 
 <Header Text="Sign In" />
 
@@ -38,8 +43,25 @@
         };
     }
 
-    private void Submit()
+    private async void Submit()
     {
+        Logger.LogInformation("Submitting sign in request");
+
+        var dto = new SignInDto()
+            {
+                Email = Model.Email,
+                MasterPassword = Model.MasterPassword,
+            };
+
+        var user = UserService.SignIn(dto);
+
+        AuthStateContainer.LoggedInUser = user;
+        await SecureStorage.Default.SetAsync("user_id", user.Id.ToString());
+
+        Logger.LogInformation($"Signed user in: {user.Id}");
+
         InitialiseModel();
+
+        Navigation.NavigateTo("/");
     }
 }

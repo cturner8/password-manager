@@ -1,14 +1,28 @@
 ﻿@page "/"
 
+@inherits AuthProvider
+
+@inject AuthStateContainer AuthStateContainer
 @inject ILogger<Index> Logger
 @inject NavigationManager Navigation
 
 <Header Text="Home" />
 
+@if (AuthStateContainer.LoggedInUser != null)
+{
+    <p>Hello, @(AuthStateContainer.LoggedInUser.Id)</p>
+}
+
 @code {
-    protected override void OnInitialized()
+    protected async override void OnInitialized()
     {
-        Logger.LogInformation("Navigating to login page");
-        Navigation.NavigateTo("auth/signin");
+        var userId = await SecureStorage.Default.GetAsync("user_id");
+        Logger.LogDebug($"User ID: {userId}");
+
+        if (AuthStateContainer.LoggedInUser == null)
+        {
+            Logger.LogInformation("Navigating to login page");
+            Navigation.NavigateTo("auth/signin");
+        }
     }
 }

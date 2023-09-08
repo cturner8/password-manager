@@ -1,10 +1,13 @@
 ﻿@page "/logins"
 
+@inherits ProtectedPage
 
 @using API.Services;
 @using Database.Models;
 @using PasswordManager.Shared.Table
 
+
+@inject AuthStateContainer AuthStateContainer
 @inject VaultLoginService VaultLoginService
 
 @if (logins == null)
@@ -50,7 +53,7 @@ else
     {
         var dto = new GetUserLoginsDto()
         {
-            UserId = Guid.Parse("ED8AAE48-E379-43B5-BADC-EE1627B6361A"), // TODO
+            UserId = AuthStateContainer.LoggedInUser.Id,
         };
         logins = VaultLoginService.GetAll(dto);
     }

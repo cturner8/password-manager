@@ -1,7 +1,10 @@
 ﻿@page "/notes/create"
 
+@inherits ProtectedPage
+
 @inject ILogger<Create> Logger
 @inject VaultNoteService VaultNoteService
+@inject AuthStateContainer AuthStateContainer
 
 <Header Text="New Note" />
 
@@ -50,7 +53,7 @@
 
         var dto = new CreateVaultNoteDto()
         {
-            UserId = Guid.Parse("ED8AAE48-E379-43B5-BADC-EE1627B6361A"), // TODO
+            UserId = AuthStateContainer.LoggedInUser.Id,
             Name = Model.Name,
             Description = Model.Description,
             Note = Model.Note

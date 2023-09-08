@@ -27,7 +27,8 @@ public class VaultContext : DbContext
 #if DEBUG
         options
         .UseSqlite($"Data Source={DbPath}")
-        .EnableSensitiveDataLogging();
+        .EnableSensitiveDataLogging()
+        .EnableDetailedErrors();
 #else
         options
         .UseSqlite($"Data Source={DbPath}");

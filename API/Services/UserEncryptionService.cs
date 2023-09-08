@@ -11,20 +11,16 @@ namespace API.Services;
 public class UserEncryptionService
 {
     private readonly KeyDerivationService _keyDerivationService;
-    //private readonly VaultContext _vaultContext;
 
     private readonly IDbContextFactory<VaultContext> _contextFactory;
 
 
     public UserEncryptionService(
         KeyDerivationService keyDerivationService,
-        //VaultContext vaultContext,
         IDbContextFactory<VaultContext> contextFactory
-
         )
     {
         _keyDerivationService = keyDerivationService;
-        //_vaultContext = vaultContext;
         _contextFactory = contextFactory;
 
     }
@@ -34,7 +30,7 @@ public class UserEncryptionService
         return _keyDerivationService.GenerateKey(password, salt);
     }
 
-    public UserKeyMetadata GenerateUserKeyMetadata(string email)
+    public async Task<UserKeyMetadata> GenerateUserKeyMetadata(string email)
     {
         using var vaultContext = _contextFactory.CreateDbContext();
 
@@ -51,7 +47,7 @@ public class UserEncryptionService
         };
 
         vaultContext.UserKeyMetadata.Add(userKeyMetadata);
-        vaultContext.SaveChanges();
+        await vaultContext.SaveChangesAsync();
 
         return userKeyMetadata;
     }
