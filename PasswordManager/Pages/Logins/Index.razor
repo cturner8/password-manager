@@ -6,7 +6,7 @@
 @using Database.Models;
 @using PasswordManager.Shared.Table
 
-
+@inject ILogger<Index> Logger
 @inject AuthStateContainer AuthStateContainer
 @inject VaultLoginService VaultLoginService
 
@@ -51,10 +51,17 @@ else
 
     protected override void OnInitialized()
     {
-        var dto = new GetUserLoginsDto()
+        try
         {
-            UserId = AuthStateContainer.LoggedInUser.Id,
-        };
-        logins = VaultLoginService.GetAll(dto);
-    }
+            var dto = new GetUserLoginsDto()
+            {
+                UserId = AuthStateContainer.LoggedInUser.Id,
+            };
+            logins = VaultLoginService.GetAll(dto);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Error getting user logins: {e.Message}");
+        }
+ }
 }

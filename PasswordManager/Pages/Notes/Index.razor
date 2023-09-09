@@ -8,6 +8,7 @@
 
 @inject AuthStateContainer AuthStateContainer
 @inject VaultNoteService VaultNoteService
+@inject ILogger<Index> Logger
 
 
 @if (notes == null)
@@ -45,10 +46,17 @@ else
 
     protected override void OnInitialized()
     {
-        var dto = new GetUserVaultNotesDto()
-            {
-                UserId = AuthStateContainer.LoggedInUser.Id
-            };
-        notes = VaultNoteService.GetAll(dto);
+        try 
+        {
+            var dto = new GetUserVaultNotesDto()
+                {
+                    UserId = AuthStateContainer.LoggedInUser.Id
+                };
+            notes = VaultNoteService.GetAll(dto);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Error getting notes: {e.Message}");
+        }
     }
 }

@@ -1,28 +1,52 @@
 ﻿@page "/"
 
+@using Encryption.Services;
+@using System.Text;
+
 @inherits AuthProvider
 
 @inject AuthStateContainer AuthStateContainer
 @inject ILogger<Index> Logger
 @inject NavigationManager Navigation
+@inject EncryptionService EncryptionService
+@inject UserService UserService
+@inject SessionService SessionService
 
-<Header Text="Home" />
+<Header Text="Home">
+    <Button Text="Sign Out" OnClick="HandleSignOut" />
+</Header>
 
 @if (AuthStateContainer.LoggedInUser != null)
 {
-    <p>Hello, @(AuthStateContainer.LoggedInUser.Id)</p>
+    <p>Hello, @(AuthStateContainer.LoggedInUser.Firstname)</p>
 }
 
 @code {
     protected async override void OnInitialized()
     {
-        var userId = await SecureStorage.Default.GetAsync("user_id");
-        Logger.LogDebug($"User ID: {userId}");
+        try
+        {
+            await SessionService.Restore(AuthStateContainer);
+            RedirectToLogin();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"An error occurred: {e.Message}");
+        }
+    }
 
+    private void RedirectToLogin()
+    {
         if (AuthStateContainer.LoggedInUser == null)
         {
             Logger.LogInformation("Navigating to login page");
             Navigation.NavigateTo("auth/signin");
         }
     }
-}
+
+    private void HandleSignOut()
+    {
+        SessionService.Clear(AuthStateContainer);
+        RedirectToLogin();
+    }
+ }

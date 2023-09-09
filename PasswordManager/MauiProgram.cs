@@ -3,6 +3,7 @@ using Database.Context;
 using Encryption.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using PasswordManager.Services;
 using PasswordManager.State;
 
 namespace PasswordManager
@@ -59,6 +60,8 @@ namespace PasswordManager
                 keyDerivationPreferences.HashAlgorithm,
                 keyDerivationPreferences.KeySize
             ));
+
+            builder.Services.AddSingleton<SessionService>();
 
             builder.Services.AddSingleton<EncryptionService>();
             builder.Services.AddSingleton<UserEncryptionService>();

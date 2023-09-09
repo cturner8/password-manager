@@ -25,6 +25,12 @@ public class EncryptionService
         _iv = iv;
     }
 
+    public void Clear()
+    {
+        _key = null;
+        _iv = null;
+    }
+
     public byte[] EncryptString(string plainText)
     {
         // Check arguments.

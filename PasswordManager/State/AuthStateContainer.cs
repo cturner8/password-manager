@@ -1,12 +1,12 @@
-﻿using Database.Models;
+﻿using API.Dto.User;
 
 namespace PasswordManager.State;
 
 public class AuthStateContainer
 {
-    private User User = null;
+    private GetUserDto User = null;
 
-    public User LoggedInUser
+    public GetUserDto LoggedInUser
     {
         get => User;
         set

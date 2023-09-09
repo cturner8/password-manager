@@ -38,7 +38,29 @@ public class UserService
         return key;
     }
 
-    public async Task<User> SignUp(SignUpDto dto)
+    private GetUserDto DecryptUser(User x) => new()
+    {
+        Id = x.Id,
+        CreatedById = x.CreatedById,
+        UpdatedById = x.UpdatedById,
+        Email = _encryptionService.DecryptString(x.Email),
+        Firstname = _encryptionService.DecryptString(x.Firstname),
+        Surname = _encryptionService.DecryptString(x.Surname),
+        CreatedDate = _encryptionService.DecryptDateTime(x.CreatedDate),
+        UpdatedDate = _encryptionService.DecryptDateTime(x.UpdatedDate)
+    };
+
+    public GetUserDto GetUser(Guid id)
+    {
+        using var vaultContext = _contextFactory.CreateDbContext();
+        var user = vaultContext.Users
+            .Select(DecryptUser)
+            .SingleOrDefault(x => x.Id == id)
+            ?? throw new NotFoundException("User");
+        return user;
+    }
+
+    public async Task<UserResultDto> SignUp(SignUpDto dto)
     {
         try
         {
@@ -73,7 +95,12 @@ public class UserService
 
             await vaultContext.SaveChangesAsync();
 
-            return user;
+            return new UserResultDto()
+            {
+                User = DecryptUser(user),
+                Key = key,
+                IV = userKeyMetadata.IV
+            };
         }
         catch (Exception e)
         {
@@ -82,7 +109,7 @@ public class UserService
         }
     }
 
-    public User SignIn(SignInDto dto)
+    public UserResultDto SignIn(SignInDto dto)
     {
         using var vaultContext = _contextFactory.CreateDbContext();
 
@@ -93,9 +120,13 @@ public class UserService
         var encryptedEmail = _encryptionService.EncryptString(dto.Email);
 
         var user = vaultContext.Users
-            .Where(x => x.Email == encryptedEmail)
-            .SingleOrDefault() ?? throw new SignInException();
+            .SingleOrDefault(x => x.Email == encryptedEmail) ?? throw new SignInException();
 
-        return user;
+        return new UserResultDto()
+        {
+            User = DecryptUser(user),
+            Key = key,
+            IV = userKeyMetadata.IV
+        };
     }
 }

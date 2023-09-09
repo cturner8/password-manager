@@ -1,10 +1,12 @@
 ﻿@page "/auth/signin"
 @using API.Dto.User;
+@using System.Text;
 
 @inject ILogger<SignIn> Logger
 @inject UserService UserService
 @inject NavigationManager Navigation
 @inject AuthStateContainer AuthStateContainer
+@inject SessionService SessionService
 
 <Header Text="Sign In" />
 
@@ -45,23 +47,29 @@
 
     private async void Submit()
     {
-        Logger.LogInformation("Submitting sign in request");
+        try 
+        {
+            Logger.LogInformation("Submitting sign in request");
 
-        var dto = new SignInDto()
+            var dto = new SignInDto()
             {
                 Email = Model.Email,
                 MasterPassword = Model.MasterPassword,
             };
 
-        var user = UserService.SignIn(dto);
+            var result = UserService.SignIn(dto);
+            await SessionService.Save(AuthStateContainer, result);
 
-        AuthStateContainer.LoggedInUser = user;
-        await SecureStorage.Default.SetAsync("user_id", user.Id.ToString());
+            Logger.LogInformation($"Signed user in: {result.User.Id}");
 
-        Logger.LogInformation($"Signed user in: {user.Id}");
+            InitialiseModel();
 
-        InitialiseModel();
+            Navigation.NavigateTo("/");
 
-        Navigation.NavigateTo("/");
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Sign in error: {e.Message}");
+        }
     }
 }

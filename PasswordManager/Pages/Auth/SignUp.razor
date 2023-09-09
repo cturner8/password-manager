@@ -1,8 +1,12 @@
 ﻿@page "/auth/signup"
 @using API.Dto.User;
+@using System.Text;
 
 @inject ILogger<SignUp> Logger
 @inject UserService UserService
+@inject AuthStateContainer AuthStateContainer
+@inject NavigationManager Navigation
+@inject SessionService SessionService
 
 
 <Header Text="Sign Up" />
@@ -57,20 +61,30 @@
 
     private async void Submit()
     {
-        Logger.LogInformation("Submitting sign up request");
-
-        var dto = new SignUpDto()
+        try
         {
-            Email = Model.Email,
-            MasterPassword = Model.MasterPassword,
-            Firstname = Model.Firstname,
-            Surname = Model.Surname
-        };
+             Logger.LogInformation("Submitting sign up request");
 
-        var user = await UserService.SignUp(dto);
+            var dto = new SignUpDto()
+            {
+                Email = Model.Email,
+                MasterPassword = Model.MasterPassword,
+                Firstname = Model.Firstname,
+                Surname = Model.Surname
+            };
 
-        Logger.LogInformation($"Signed user up: {user.Id}");
+            var result = await UserService.SignUp(dto);
+            await SessionService.Save(AuthStateContainer, result);
 
-        InitialiseModel();
+            Logger.LogInformation($"Signed user up: {result.User.Id}");
+
+            InitialiseModel();
+
+            Navigation.NavigateTo("/");
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Sign up error: {e.Message}");
+        }
     }
 }

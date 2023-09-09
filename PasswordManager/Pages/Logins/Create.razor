@@ -1,9 +1,11 @@
 ﻿@page "/logins/create"
 
+@inherits ProtectedPage
+
 @inject ILogger<Create> Logger
 @inject VaultLoginService VaultLoginService
+@inject AuthStateContainer AuthStateContainer
 
-@inherits ProtectedPage
 
 
 <Header Text="New Login" />
@@ -80,25 +82,31 @@
 
     private void Submit()
     {
-        Logger.LogInformation("Form Submitted");
+        try {
+            Logger.LogInformation("Form Submitted");
 
-        var dto = new CreateVaultLoginDto()
+            var dto = new CreateVaultLoginDto()
+            {
+                UserId = AuthStateContainer.LoggedInUser.Id,
+                Name = Model.Name,
+                Description = Model.Description,
+                URL = Model.URL,
+                Email = Model.Email,
+                Username = Model.Username,
+                Password = Model.Password,
+                Category = Model.Category,
+                Notes = Model.Notes
+            };
+            var vaultLogin = VaultLoginService.Create(dto);
+
+            Logger.LogInformation($"Created vault login: {vaultLogin.Id}");
+
+            InitialiseModel();
+        }
+        catch (Exception e)
         {
-            UserId = Guid.Parse("ED8AAE48-E379-43B5-BADC-EE1627B6361A"), // TODO
-            Name = Model.Name,
-            Description = Model.Description,
-            URL = Model.URL,
-            Email = Model.Email,
-            Username = Model.Username,
-            Password = Model.Password,
-            Category = Model.Category,
-            Notes = Model.Notes
-        };
-        var vaultLogin = VaultLoginService.Create(dto);
-
-        Logger.LogInformation($"Created vault login: {vaultLogin.Id}");
-
-        InitialiseModel();
+            Logger.LogError($"Error creating login: {e.Message}");
+        }
     }
 
     private void GeneratePassword(EventArgs e)
