@@ -3,7 +3,6 @@ using API.Services;
 using Encryption.Services;
 using Microsoft.Extensions.Logging;
 using PasswordManager.State;
-using System.Text;
 
 namespace PasswordManager.Services;
 
@@ -32,9 +31,12 @@ public class SessionService
         authStateContainer.LoggedInUser = dto.User;
 
         await SecureStorage.Default.SetAsync("user_id", dto.User.Id.ToString());
-        // TODO: fix saving key and iv as strings
-        await SecureStorage.Default.SetAsync("user_key", Encoding.ASCII.GetString(dto.Key));
-        await SecureStorage.Default.SetAsync("user_iv", Encoding.ASCII.GetString(dto.IV));
+
+        var keyString = Convert.ToBase64String(dto.Key);
+        var ivString = Convert.ToBase64String(dto.IV);
+
+        await SecureStorage.Default.SetAsync("user_key", keyString);
+        await SecureStorage.Default.SetAsync("user_iv", ivString);
 
         _logger.LogInformation("Session saved");
     }
@@ -47,11 +49,11 @@ public class SessionService
 
             _logger.LogInformation("Attempting to restore the user session");
 
-            var userId = await SecureStorage.Default.GetAsync("user_id");
-            var userKey = await SecureStorage.Default.GetAsync("user_key");
-            var userIV = await SecureStorage.Default.GetAsync("user_iv");
+            var userIdString = await SecureStorage.Default.GetAsync("user_id");
+            var userKeyString = await SecureStorage.Default.GetAsync("user_key");
+            var userIVString = await SecureStorage.Default.GetAsync("user_iv");
 
-            if (userId == null || userKey == null || userIV == null)
+            if (userIdString == null || userKeyString == null || userKeyString == null)
             {
                 _logger.LogInformation("No user session found");
                 return;
@@ -59,12 +61,12 @@ public class SessionService
 
             _logger.LogInformation("Restoring the user session");
 
-            // TODO: fix parsing of saved string content
-            var key = Encoding.ASCII.GetBytes(userKey);
-            var iv = Encoding.ASCII.GetBytes(userIV);
+            var userId = Guid.Parse(userIdString);
+            var userKey = Convert.FromBase64String(userKeyString);
+            var userIV = Convert.FromBase64String(userIVString);
 
-            _encryptionService.Initialise(key, iv);
-            authStateContainer.LoggedInUser = _userService.GetUser(Guid.Parse(userId));
+            _encryptionService.Initialise(userKey, userIV);
+            authStateContainer.LoggedInUser = _userService.GetUser(userId);
 
             _logger.LogInformation("Session restored");
         }
