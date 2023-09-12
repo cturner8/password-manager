@@ -80,7 +80,7 @@
         };
     }
 
-    private void Submit()
+    private async Task Submit()
     {
         try {
             Logger.LogInformation("Form Submitted");
@@ -97,7 +97,7 @@
                 Category = Model.Category,
                 Notes = Model.Notes
             };
-            var vaultLogin = VaultLoginService.Create(dto);
+            var vaultLogin = await VaultLoginService.Create(dto);
 
             Logger.LogInformation($"Created vault login: {vaultLogin.Id}");
 

@@ -28,11 +28,12 @@ public class VaultLoginService
 
     public async Task<VaultLogin> Create(CreateVaultLoginDto dto)
     {
-        using var vaultContext = _contextFactory.CreateDbContext();
+        var vaultContext = _contextFactory.CreateDbContext();
 
         Vault vault = _vaultService.GetUserVault(dto.UserId);
         var vaultLogin = new VaultLogin()
         {
+            VaultId = vault.Id,
             Name = _encryptionService.EncryptString(dto.Name),
             Description = dto.Description != null ? _encryptionService.EncryptString(dto.Description) : null,
             Email = _encryptionService.EncryptString(dto.Email),
@@ -42,7 +43,6 @@ public class VaultLoginService
             Category = dto.Category != null ? _encryptionService.EncryptString(dto.Category) : null,
             Notes = dto.Notes != null ? _encryptionService.EncryptString(dto.Notes) : null,
             Active = true,
-            Vault = vault,
             CreatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
             UpdatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
         };
@@ -55,10 +55,11 @@ public class VaultLoginService
 
     public IEnumerable<VaultLoginSummaryDto> GetAll(GetUserLoginsDto dto)
     {
-        using var vaultContext = _contextFactory.CreateDbContext();
+        var vaultContext = _contextFactory.CreateDbContext();
 
         Vault vault = _vaultService.GetUserVault(dto.UserId);
         return vaultContext.VaultLogins
+            .AsNoTracking()
             .Where(x => x.Vault == vault)
             .Select(x => new VaultLoginSummaryDto()
             {
@@ -74,10 +75,11 @@ public class VaultLoginService
 
     public VaultLoginDetailsDto Get(GetVaultLoginDto dto)
     {
-        using var vaultContext = _contextFactory.CreateDbContext();
+        var vaultContext = _contextFactory.CreateDbContext();
 
         Vault vault = _vaultService.GetUserVault(dto.UserId);
         var vaultLoginDetails = vaultContext.VaultLogins
+            .AsNoTracking()
             .Where(x => x.Vault == vault && x.Id == dto.Id)
             .Select(x => new VaultLoginDetailsDto()
             {

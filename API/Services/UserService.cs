@@ -54,6 +54,7 @@ public class UserService
     {
         using var vaultContext = _contextFactory.CreateDbContext();
         var user = vaultContext.Users
+            .AsNoTracking()
             .Select(DecryptUser)
             .SingleOrDefault(x => x.Id == id)
             ?? throw new NotFoundException("User");
@@ -64,7 +65,7 @@ public class UserService
     {
         try
         {
-            using var vaultContext = _contextFactory.CreateDbContext();
+            var vaultContext = _contextFactory.CreateDbContext();
 
             var userKeyMetadata = await _userEncryptionService.GenerateUserKeyMetadata(dto.Email);
             var key = InitialiseEncryption(dto.MasterPassword, userKeyMetadata.Salt, userKeyMetadata.IV);
@@ -80,18 +81,18 @@ public class UserService
             };
 
             // TODO
-            //var userVault = new Vault()
-            //{
-            //    Name = _encryptionService.EncryptString("My Vault"),
-            //    Logins = new List<VaultLogin>(),
-            //    Notes = new List<VaultNote>(),
-            //    CreatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
-            //    UpdatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
-            //    Active = true
-            //};
+            var userVault = new Vault()
+            {
+                Name = _encryptionService.EncryptString("My Vault"),
+                Logins = new List<VaultLogin>(),
+                Notes = new List<VaultNote>(),
+                CreatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
+                UpdatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
+                Active = true
+            };
 
             vaultContext.Users.Add(user);
-            //user.Vaults.Add(userVault);
+            user.Vaults.Add(userVault);
 
             await vaultContext.SaveChangesAsync();
 
@@ -111,7 +112,7 @@ public class UserService
 
     public UserResultDto SignIn(SignInDto dto)
     {
-        using var vaultContext = _contextFactory.CreateDbContext();
+        var vaultContext = _contextFactory.CreateDbContext();
 
         var emailHash = UserEncryptionService.GenerateUserHash(dto.Email);
 
@@ -120,6 +121,7 @@ public class UserService
         var encryptedEmail = _encryptionService.EncryptString(dto.Email);
 
         var user = vaultContext.Users
+            .AsNoTracking()
             .SingleOrDefault(x => x.Email == encryptedEmail) ?? throw new SignInException();
 
         return new UserResultDto()

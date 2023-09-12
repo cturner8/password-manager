@@ -28,16 +28,16 @@ public class VaultNoteService
 
     public async Task<VaultNote> Create(CreateVaultNoteDto dto)
     {
-        using var vaultContext = _contextFactory.CreateDbContext();
+        var vaultContext = _contextFactory.CreateDbContext();
 
         Vault vault = _vaultService.GetUserVault(dto.UserId);
         var vaultNote = new VaultNote()
         {
+            VaultId = vault.Id,
             Name = _encryptionService.EncryptString(dto.Name),
             Description = dto.Description != null ? _encryptionService.EncryptString(dto.Description) : null,
             Note = _encryptionService.EncryptString(dto.Note),
             Active = true,
-            Vault = vault,
             CreatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
             UpdatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
         };
@@ -50,10 +50,11 @@ public class VaultNoteService
 
     public IEnumerable<VaultNoteSummaryDto> GetAll(GetUserVaultNotesDto dto)
     {
-        using var vaultContext = _contextFactory.CreateDbContext();
+        var vaultContext = _contextFactory.CreateDbContext();
 
         Vault vault = _vaultService.GetUserVault(dto.UserId);
         return vaultContext.VaultNotes
+            .AsNoTracking()
             .Where(x => x.Vault == vault)
             .Select(x => new VaultNoteSummaryDto()
             {
@@ -66,10 +67,11 @@ public class VaultNoteService
 
     public VaultNoteDetailsDto Get(GetVaultNoteDto dto)
     {
-        using var vaultContext = _contextFactory.CreateDbContext();
+        var vaultContext = _contextFactory.CreateDbContext();
 
         Vault vault = _vaultService.GetUserVault(dto.UserId);
         var vaultNoteDetails = vaultContext.VaultNotes
+            .AsNoTracking()
             .Where(x => x.Vault == vault && x.Id == dto.Id)
             .Select(x => new VaultNoteDetailsDto()
             {

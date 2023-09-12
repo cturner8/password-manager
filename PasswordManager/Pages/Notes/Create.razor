@@ -47,7 +47,7 @@
         };
     }
 
-    private void Submit()
+    private async Task Submit()
     {
         try 
         {
@@ -60,7 +60,7 @@
                 Description = Model.Description,
                 Note = Model.Note
             };
-            var vaultNote = VaultNoteService.Create(dto);
+            var vaultNote = await VaultNoteService.Create(dto);
 
             Logger.LogInformation($"Created vault note: {vaultNote.Id}");
 

@@ -32,7 +32,7 @@ public class UserEncryptionService
 
     public async Task<UserKeyMetadata> GenerateUserKeyMetadata(string email)
     {
-        using var vaultContext = _contextFactory.CreateDbContext();
+        var vaultContext = _contextFactory.CreateDbContext();
 
         var aes = Aes.Create();
         var salt = KeyDerivationService.GenerateSalt(16);
@@ -55,7 +55,7 @@ public class UserEncryptionService
     public static byte[] GenerateUserHash(string email)
     {
         var emailBytes = Encoding.ASCII.GetBytes(email);
-        return MD5.HashData(emailBytes);
+        return SHA256.HashData(emailBytes);
     }
 
 }

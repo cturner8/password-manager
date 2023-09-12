@@ -17,10 +17,11 @@ public class VaultService
 
     public Vault GetUserVault(Guid userId)
     {
-        using var vaultContext = _contextFactory.CreateDbContext();
+        var vaultContext = _contextFactory.CreateDbContext();
 
         var userVault = vaultContext.Vaults
             .Where(x => x.UserId == userId)
+            .AsNoTracking()
             .SingleOrDefault() ?? throw new NotFoundException("Vault");
         return userVault;
     }
