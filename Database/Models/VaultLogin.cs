@@ -13,5 +13,5 @@ public class VaultLogin : Entity
     public byte[]? Category { get; set; }
     public bool Active { get; set; }
 
-    public required Vault Vault { get; set; }
+    public Vault? Vault { get; set; }
 }

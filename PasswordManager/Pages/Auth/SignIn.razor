@@ -1,0 +1,75 @@
+﻿@page "/auth/signin"
+@using API.Dto.User;
+@using System.Text;
+
+@inject ILogger<SignIn> Logger
+@inject UserService UserService
+@inject NavigationManager Navigation
+@inject AuthStateContainer AuthStateContainer
+@inject SessionService SessionService
+
+<Header Text="Sign In" />
+
+<EditForm Model="@Model" OnSubmit="@Submit" class="flex flex-col gap-1">
+
+    <label for="email">
+        Email:<br>
+        <InputText @bind-Value="Model!.Email" id="email" class="rounded-md focus:border-primary outline-none" />
+    </label>
+
+    <label for="masterPassword">
+        Master Password:<br>
+        <InputText @bind-Value="Model!.MasterPassword" id="masterPassword" type="password" class="rounded-md focus:border-primary outline-none" />
+    </label>
+
+    <Button Text="Submit" Type="submit" />
+    <NavLink href="auth/signup">
+        <Button Text="Sign Up" />
+    </NavLink>
+</EditForm>
+
+@code {
+    public SignInModel Model { get; set; }
+
+    protected override void OnInitialized()
+    {
+        InitialiseModel();
+    }
+
+    private void InitialiseModel()
+    {
+        Model = new()
+        {
+            Email = "",
+            MasterPassword = ""
+        };
+    }
+
+    private async Task Submit()
+    {
+        try 
+        {
+            Logger.LogInformation("Submitting sign in request");
+
+            var dto = new SignInDto()
+            {
+                Email = Model.Email,
+                MasterPassword = Model.MasterPassword,
+            };
+
+            var result = UserService.SignIn(dto);
+            await SessionService.Save(AuthStateContainer, result);
+
+            Logger.LogInformation($"Signed user in: {result.User.Id}");
+
+            InitialiseModel();
+
+            Navigation.NavigateTo("/");
+
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Sign in error: {e.Message}");
+        }
+    }
+}

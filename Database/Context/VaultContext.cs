@@ -14,13 +14,24 @@ public class VaultContext : DbContext
 
     public string DbPath { get; }
 
-    public VaultContext(DbContextOptions<VaultContext> options) : base(options)
+    public VaultContext(DbContextOptions<VaultContext> options)
+        : base(options)
     {
-        var folder = Environment.SpecialFolder.LocalApplicationData;
+        var folder = Environment.SpecialFolder.LocalApplicationData; // ApplicationData foler instead?
         var path = Environment.GetFolderPath(folder);
-        DbPath = Path.Join(path, "vault.db");
+        DbPath = Path.Join(path, $"{nameof(VaultContext)}.db");
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseSqlite($"Data Source={DbPath}");
+    {
+#if DEBUG
+        options
+        .UseSqlite($"Data Source={DbPath}")
+        .EnableSensitiveDataLogging()
+        .EnableDetailedErrors();
+#else
+        options
+        .UseSqlite($"Data Source={DbPath}");
+#endif
+    }
 }

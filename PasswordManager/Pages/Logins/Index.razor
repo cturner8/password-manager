@@ -1,10 +1,13 @@
 ﻿@page "/logins"
 
+@inherits ProtectedPage
 
 @using API.Services;
 @using Database.Models;
 @using PasswordManager.Shared.Table
 
+@inject ILogger<Index> Logger
+@inject AuthStateContainer AuthStateContainer
 @inject VaultLoginService VaultLoginService
 
 @if (logins == null)
@@ -44,10 +47,21 @@ else
 }
 
 @code {
-    private IEnumerable<VaultLogin> logins;
+    private IEnumerable<VaultLoginSummaryDto> logins;
 
     protected override void OnInitialized()
     {
-        logins = VaultLoginService.GetAll();
-    }
+        try
+        {
+            var dto = new GetUserLoginsDto()
+            {
+                UserId = AuthStateContainer.LoggedInUser.Id,
+            };
+            logins = VaultLoginService.GetAll(dto);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Error getting user logins: {e.Message}");
+        }
+ }
 }

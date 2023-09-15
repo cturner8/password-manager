@@ -8,5 +8,5 @@ public class VaultNote : Entity
     public byte[]? Description { get; set; }
     public bool Active { get; set; }
 
-    public required Vault Vault { get; set; }
+    public Vault? Vault { get; set; }
 }

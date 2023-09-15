@@ -1,10 +1,14 @@
 ﻿@page "/notes"
 
+@inherits ProtectedPage
+
 @using API.Services;
 @using Database.Models;
 @using PasswordManager.Shared.Table
 
+@inject AuthStateContainer AuthStateContainer
 @inject VaultNoteService VaultNoteService
+@inject ILogger<Index> Logger
 
 
 @if (notes == null)
@@ -38,10 +42,21 @@ else
 }
 
 @code {
-    private IEnumerable<VaultNote> notes;
+    private IEnumerable<VaultNoteSummaryDto> notes;
 
     protected override void OnInitialized()
     {
-        notes = VaultNoteService.GetAll();
+        try 
+        {
+            var dto = new GetUserVaultNotesDto()
+                {
+                    UserId = AuthStateContainer.LoggedInUser.Id
+                };
+            notes = VaultNoteService.GetAll(dto);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Error getting notes: {e.Message}");
+        }
     }
 }

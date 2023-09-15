@@ -1,7 +1,10 @@
 ﻿@page "/notes/create"
 
+@inherits ProtectedPage
+
 @inject ILogger<Create> Logger
 @inject VaultNoteService VaultNoteService
+@inject AuthStateContainer AuthStateContainer
 
 <Header Text="New Note" />
 
@@ -44,21 +47,28 @@
         };
     }
 
-    private void Submit()
+    private async Task Submit()
     {
-        Logger.LogInformation("Form Submitted");
-
-        var dto = new CreateVaultNoteDto()
+        try 
         {
-            UserId = Guid.Parse("ED8AAE48-E379-43B5-BADC-EE1627B6361A"), // TODO
-            Name = Model.Name,
-            Description = Model.Description,
-            Note = Model.Note
-        };
-        var vaultNote = VaultNoteService.Create(dto);
+            Logger.LogInformation("Form Submitted");
 
-        Logger.LogInformation($"Created vault note: {vaultNote.Id}");
+            var dto = new CreateVaultNoteDto()
+            {
+                UserId = AuthStateContainer.LoggedInUser.Id,
+                Name = Model.Name,
+                Description = Model.Description,
+                Note = Model.Note
+            };
+            var vaultNote = await VaultNoteService.Create(dto);
 
-        InitialiseModel();
+            Logger.LogInformation($"Created vault note: {vaultNote.Id}");
+
+            InitialiseModel();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Error creating note: {e.Message}");
+        }
     }
 }

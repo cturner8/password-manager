@@ -25,6 +25,12 @@ public class EncryptionService
         _iv = iv;
     }
 
+    public void Clear()
+    {
+        _key = null;
+        _iv = null;
+    }
+
     public byte[] EncryptString(string plainText)
     {
         // Check arguments.
@@ -43,6 +49,7 @@ public class EncryptionService
         {
             aesAlg.Key = _key;
             aesAlg.IV = _iv;
+            aesAlg.Padding = PaddingMode.PKCS7;
 
             // Create an encryptor to perform the stream transform.
             ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
@@ -82,6 +89,7 @@ public class EncryptionService
         {
             aesAlg.Key = _key;
             aesAlg.IV = _iv;
+            aesAlg.Padding = PaddingMode.PKCS7;
 
             // Create a decryptor to perform the stream transform.
             ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
