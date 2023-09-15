@@ -53,6 +53,49 @@ public class VaultLoginService
         return vaultLogin;
     }
 
+
+    public async Task<VaultLogin> Update(UpdateVaultLoginDto dto)
+    {
+        var vaultContext = _contextFactory.CreateDbContext();
+
+        Vault vault = _vaultService.GetUserVault(dto.UserId);
+
+        var vaultLogin = vaultContext.VaultLogins
+            .SingleOrDefault(x => x.Id == dto.Id && x.Vault == vault)
+            ?? throw new NotFoundException("VaultLogin");
+
+        vaultLogin.Name = _encryptionService.EncryptString(dto.Name);
+        vaultLogin.Email = _encryptionService.EncryptString(dto.Email);
+        vaultLogin.Password = _encryptionService.EncryptString(dto.Password);
+        vaultLogin.URL = _encryptionService.EncryptString(dto.URL);
+        vaultLogin.UpdatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow);
+
+        if (dto.Description != null)
+        {
+            vaultLogin.Description = _encryptionService.EncryptString(dto.Description);
+        }
+        if (dto.Username != null)
+        {
+            vaultLogin.Username = _encryptionService.EncryptString(dto.Username);
+        }
+        if (dto.Username != null)
+        {
+            vaultLogin.Username = _encryptionService.EncryptString(dto.Username);
+        }
+        if (dto.Category != null)
+        {
+            vaultLogin.Category = _encryptionService.EncryptString(dto.Category);
+        }
+        if (dto.Notes != null)
+        {
+            vaultLogin.Notes = _encryptionService.EncryptString(dto.Notes);
+        }
+
+        await vaultContext.SaveChangesAsync();
+
+        return vaultLogin;
+    }
+
     public IEnumerable<VaultLoginSummaryDto> GetAll(GetUserLoginsDto dto)
     {
         var vaultContext = _contextFactory.CreateDbContext();

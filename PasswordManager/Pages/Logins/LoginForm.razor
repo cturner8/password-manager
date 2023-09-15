@@ -1,0 +1,231 @@
+﻿@inherits ProtectedPage
+
+
+@inject ILogger<Create> Logger
+@inject VaultLoginService VaultLoginService
+@inject AuthStateContainer AuthStateContainer
+@inject NavigationManager Navigation
+
+
+<Header Text="@Header" />
+
+<EditForm EditContext="editContext" OnValidSubmit="@Submit" class="flex flex-col gap-1">
+
+    <label for="name">
+        Name:<br>
+        <InputText @bind-Value="Model!.Name" id="name" class="rounded-md focus:border-primary outline-none" />
+    </label>
+    <div>
+        <ValidationMessage For="() => Model!.Name" class="text-red-800" />
+    </div>
+
+    <label for="description">
+        Description:<br>
+        <InputTextArea @bind-Value="Model!.Description" id="description" class="rounded-md focus:border-primary outline-none" />
+    </label>
+
+    <label for="url">
+        URL:<br>
+        <InputText @bind-Value="Model!.URL" id="url" class="rounded-md focus:border-primary outline-none" />
+    </label>
+    <div>
+        <ValidationMessage For="() => Model!.URL" class="text-red-800" />
+    </div>
+
+    <label for="email">
+        Email:<br>
+        <InputText @bind-Value="Model!.Email" type="email" id="email" class="rounded-md focus:border-primary outline-none" />
+    </label>
+    <div>
+        <ValidationMessage For="() => Model!.Email" class="text-red-800" />
+    </div>
+
+    <label for="username">
+        Username:<br>
+        <InputText @bind-Value="Model!.Username" id="username" class="rounded-md focus:border-primary outline-none" />
+    </label>
+
+    <label for="password">
+        Password:<br>
+        <InputText @bind-Value="Model!.Password" type="password" id="password" class="rounded-md focus:border-primary outline-none" />
+    </label>
+    <div>
+        <ValidationMessage For="() => Model!.Password" class="text-red-800" />
+    </div>
+    <Button Text="Generate Password" OnClick="@GeneratePassword" />
+
+    <label for="notes">
+        Notes:<br>
+        <InputTextArea @bind-Value="Model!.Notes" id="notes" class="rounded-md focus:border-primary outline-none" />
+    </label>
+
+
+    <label for="category">
+        Category:<br>
+        <InputText @bind-Value="Model!.Category" id="category" class="rounded-md focus:border-primary outline-none" />
+    </label>
+  
+    <Button Text="Save" Type="submit" />
+</EditForm>
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+    [Parameter]
+    public string Header { get; set; }
+    [Parameter]
+    public Mode Mode { get; set; }
+
+    private VaultLoginModel Model { get; set; }
+    private EditContext editContext;
+
+    private ValidationMessageStore messageStore;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        InitialiseModel();
+        editContext = new(Model);
+        editContext.OnValidationRequested += HandleValidationRequested;
+        messageStore = new(editContext);
+    }
+
+    private void HandleValidationRequested(object sender, ValidationRequestedEventArgs args)
+    {
+        messageStore?.Clear();
+
+        if (Model!.Name == null)
+        {
+            messageStore?.Add(() => Model.Name, "Name is required.");
+        }
+        if (Model!.URL == null)
+        {
+            messageStore?.Add(() => Model.URL, "URL is required.");
+        }
+        if (Model!.Email == null)
+        {
+            messageStore?.Add(() => Model.Email, "Email is required.");
+        }
+        if (Model!.Password == null)
+        {
+            messageStore?.Add(() => Model.Password, "Password is required.");
+        }
+    }
+
+    private  void InitialiseModel()
+    {
+        Model = new()
+        {
+            Email = null,
+            Name = null,
+            Password = null,
+            URL = null,
+            Category = null,
+            Description = null,
+            Notes = null,
+            Username = null
+        };
+        if (Mode != Mode.Edit || !Id.HasValue) return;
+
+        var vaultLogin = VaultLoginService.Get(new()
+        {
+            Id = Id.Value,
+            UserId = AuthStateContainer.LoggedInUser.Id,
+        });
+
+        Model = new()
+        {
+            Email = vaultLogin.Email,
+            Name = vaultLogin.Name,
+            Password = vaultLogin.Password,
+            URL = vaultLogin.URL,
+            Category = vaultLogin.Category,
+            Description = vaultLogin.Description,
+            Notes = vaultLogin.Notes,
+            Username = vaultLogin.Username
+        };
+    }
+
+    private async Task Submit()
+    {
+        try {
+            Logger.LogInformation("Form Submitted");
+
+            if (Mode == Mode.Edit)
+            {
+                await UpdateLogin();
+            }
+            else
+            {
+                await CreateLogin();
+            }
+
+            InitialiseModel();
+
+            Navigation.NavigateTo("logins");
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Error creating login: {e.Message}");
+        }
+    }
+
+    private async Task CreateLogin()
+    {
+        var dto = new CreateVaultLoginDto()
+            {
+                UserId = AuthStateContainer.LoggedInUser.Id,
+                Name = Model.Name,
+                Description = Model.Description,
+                URL = Model.URL,
+                Email = Model.Email,
+                Username = Model.Username,
+                Password = Model.Password,
+                Category = Model.Category,
+                Notes = Model.Notes
+            };
+        var vaultLogin = await VaultLoginService.Create(dto);
+
+        Logger.LogInformation($"Created vault login: {vaultLogin.Id}");
+    }
+
+
+    private async Task UpdateLogin()
+    {
+        var dto = new UpdateVaultLoginDto()
+            {
+                Id = Id.Value,
+                UserId = AuthStateContainer.LoggedInUser.Id,
+                Name = Model.Name,
+                Description = Model.Description,
+                URL = Model.URL,
+                Email = Model.Email,
+                Username = Model.Username,
+                Password = Model.Password,
+                Category = Model.Category,
+                Notes = Model.Notes
+            };
+        var vaultLogin = await VaultLoginService.Update(dto);
+
+        Logger.LogInformation($"Updated vault login: {vaultLogin.Id}");
+    }
+
+    private void GeneratePassword(EventArgs e)
+    {
+        var dto = new GeneratePasswordDto();
+        var password = VaultLoginService.GeneratePassword(dto);
+
+        Model.Password = password;
+
+        Logger.LogInformation("Generated new password");
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+        if (editContext is not null)
+        {
+            editContext.OnValidationRequested -= HandleValidationRequested;
+        }
+    }
+}

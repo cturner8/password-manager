@@ -29,17 +29,21 @@ else
                     <TableHeader>Description</TableHeader>
                     <TableHeader>URL</TableHeader>
                     <TableHeader>Email</TableHeader>
+                    <TableHeader>Last Updated</TableHeader>
                 </TableRow>
             </TableHead>
             <TableBody>
                 @foreach (var login in logins)
                 {
-                    <TableRow Color="bg-white">
-                        <TableCell RoundDirection="l">@login.Name</TableCell>
-                        <TableCell>@login.Description</TableCell>
-                        <TableCell>@login.URL</TableCell>
-                        <TableCell RoundDirection="r">@login.Email</TableCell>
-                    </TableRow>
+                    <NavLink href="@($"logins/edit/{login.Id}")" class="flex grow">
+                        <TableRow Color="bg-white">
+                            <TableCell RoundDirection="l">@login.Name</TableCell>
+                            <TableCell>@login.Description</TableCell>
+                            <TableCell>@login.URL</TableCell>
+                            <TableCell>@login.Email</TableCell>
+                            <TableCell RoundDirection="r">@login.UpdatedDate</TableCell>
+                        </TableRow>
+                    </NavLink>
                 }
             </TableBody>
         </Table>
@@ -51,13 +55,18 @@ else
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         try
         {
+
             var dto = new GetUserLoginsDto()
             {
                 UserId = AuthStateContainer.LoggedInUser.Id,
             };
-            logins = VaultLoginService.GetAll(dto);
+            logins = VaultLoginService
+                        .GetAll(dto)
+                        .OrderByDescending(x => x.UpdatedDate);
         }
         catch (Exception e)
         {

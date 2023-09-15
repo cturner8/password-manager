@@ -80,7 +80,6 @@ public class UserService
                 UpdatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow),
             };
 
-            // TODO
             var userVault = new Vault()
             {
                 Name = _encryptionService.EncryptString("My Vault"),

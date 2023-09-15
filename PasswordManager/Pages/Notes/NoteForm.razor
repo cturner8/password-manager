@@ -1,0 +1,161 @@
+﻿@inherits ProtectedPage
+
+@inject ILogger<Create> Logger
+@inject VaultNoteService VaultNoteService
+@inject AuthStateContainer AuthStateContainer
+@inject NavigationManager Navigation
+
+
+<Header Text="@Header" />
+
+<EditForm EditContext="editContext" OnValidSubmit="@Submit" class="flex flex-col gap-1">
+
+    <label for="name">
+        Name:<br>
+        <InputText @bind-Value="Model!.Name" id="name" class="rounded-md focus:border-primary outline-none" />
+    </label>
+    <div>
+        <ValidationMessage For="() => Model!.Name" class="text-red-800" />
+    </div>
+
+    <label for="description">
+        Description:<br>
+        <InputTextArea @bind-Value="Model!.Description" id="description" class="rounded-md focus:border-primary outline-none" />
+    </label>
+
+
+    <label for="note">
+        Note:<br>
+        <InputTextArea @bind-Value="Model!.Note" id="note" class="rounded-md focus:border-primary outline-none" />
+    </label>
+    <div>
+        <ValidationMessage For="() => Model!.Note" class="text-red-800" />
+    </div>
+
+    <Button Text="Save" Type="submit" />
+</EditForm>
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+    [Parameter]
+    public string Header { get; set; }
+    [Parameter]
+    public Mode Mode { get; set; }
+
+    public VaultNoteModel Model { get; set; }
+    private EditContext editContext;
+
+    private ValidationMessageStore messageStore;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        InitialiseModel();
+        editContext = new(Model);
+        editContext.OnValidationRequested += HandleValidationRequested;
+        messageStore = new(editContext);
+    }
+
+    private void InitialiseModel()
+    {
+        Model = new()
+        {
+            Name = null,
+            Description = null,
+            Note = null,
+        };
+        if (Mode != Mode.Edit || !Id.HasValue) return;
+
+        var vaultNote = VaultNoteService.Get(new()
+            {
+                Id = Id.Value,
+                UserId = AuthStateContainer.LoggedInUser.Id,
+            });
+
+        Model = new()
+        {
+            Name = vaultNote.Name,
+            Description = vaultNote.Description,
+            Note = vaultNote.Note,
+        };
+    }
+
+    private void HandleValidationRequested(object sender, ValidationRequestedEventArgs args)
+    {
+        messageStore?.Clear();
+
+        if (Model!.Name == null)
+        {
+            messageStore?.Add(() => Model.Name, "Name is required.");
+        }
+        if (Model!.Note == null)
+        {
+            messageStore?.Add(() => Model.Note, "Note is required.");
+        }
+    }
+
+    private async Task Submit()
+    {
+        try
+        {
+            Logger.LogInformation("Form Submitted");
+
+            if (Mode == Mode.Edit)
+            {
+                await UpdateNote();
+            }
+            else
+            {
+                await CreateNote();
+            }
+
+            InitialiseModel();
+
+            Navigation.NavigateTo("notes");
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Error creating note: {e.Message}");
+        }
+    }
+
+    private async Task CreateNote()
+    {
+        var dto = new CreateVaultNoteDto()
+        {
+            UserId = AuthStateContainer.LoggedInUser.Id,
+            Name = Model.Name,
+            Description = Model.Description,
+            Note = Model.Note
+        };
+        var vaultNote = await VaultNoteService.Create(dto);
+
+        Logger.LogInformation($"Created vault note: {vaultNote.Id}");
+    }
+
+
+    private async Task UpdateNote()
+    {
+        var dto = new UpdateVaultNoteDto()
+        {
+            Id = Id.Value,
+            UserId = AuthStateContainer.LoggedInUser.Id,
+            Name = Model.Name,
+            Description = Model.Description,
+            Note = Model.Note
+        };
+        var vaultNote = await VaultNoteService.Update(dto);
+
+        Logger.LogInformation($"Updated vault note: {vaultNote.Id}");
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+        if (editContext is not null)
+        {
+            editContext.OnValidationRequested -= HandleValidationRequested;
+        }
+    }
+}

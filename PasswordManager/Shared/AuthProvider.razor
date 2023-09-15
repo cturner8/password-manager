@@ -7,7 +7,7 @@
         AuthStateContainer.OnChange += StateHasChanged;
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         AuthStateContainer.OnChange -= StateHasChanged;
     }

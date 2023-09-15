@@ -27,14 +27,18 @@ else
             <TableHead>
                 <TableRow>
                     <TableHeader>Name</TableHeader>
+                    <TableHeader>Last Updated</TableHeader>
                 </TableRow>
             </TableHead>
             <TableBody>
                 @foreach (var note in notes)
                 {
-                    <TableRow Color="bg-white">
-                        <TableCell RoundDirection="l">@note.Name</TableCell>
-                    </TableRow>
+                    <NavLink href="@($"notes/edit/{note.Id}")" class="flex grow">
+                        <TableRow Color="bg-white">
+                            <TableCell RoundDirection="l">@note.Name</TableCell>
+                            <TableCell RoundDirection="r">@note.UpdatedDate</TableCell>
+                        </TableRow>
+                    </NavLink>
                 }
             </TableBody>
         </Table>
@@ -46,13 +50,17 @@ else
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         try 
         {
             var dto = new GetUserVaultNotesDto()
-                {
-                    UserId = AuthStateContainer.LoggedInUser.Id
-                };
-            notes = VaultNoteService.GetAll(dto);
+            {
+                UserId = AuthStateContainer.LoggedInUser.Id
+            };
+            notes = VaultNoteService
+                        .GetAll(dto)
+                        .OrderByDescending(x => x.UpdatedDate);
         }
         catch (Exception e)
         {

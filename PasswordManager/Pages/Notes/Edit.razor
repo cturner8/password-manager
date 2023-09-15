@@ -1,0 +1,12 @@
+﻿@page "/notes/edit/{Id:guid}"
+
+<NoteForm
+    Header="Edit Note"
+    Mode="@Mode.Edit"
+    Id="@Id"
+/>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+}

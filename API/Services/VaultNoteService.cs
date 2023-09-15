@@ -48,6 +48,30 @@ public class VaultNoteService
         return vaultNote;
     }
 
+
+    public async Task<VaultNote> Update(UpdateVaultNoteDto dto)
+    {
+        var vaultContext = _contextFactory.CreateDbContext();
+
+        Vault vault = _vaultService.GetUserVault(dto.UserId);
+
+        var vaultNote = vaultContext.VaultNotes
+            .SingleOrDefault(x => x.Id == dto.Id && x.Vault == vault)
+            ?? throw new NotFoundException("VaultNote");
+
+        vaultNote.Name = _encryptionService.EncryptString(dto.Name);
+        vaultNote.UpdatedDate = _encryptionService.EncryptDateTime(DateTime.UtcNow);
+
+        if (dto.Description != null)
+        {
+            vaultNote.Description = _encryptionService.EncryptString(dto.Description);
+        }
+
+        await vaultContext.SaveChangesAsync();
+
+        return vaultNote;
+    }
+
     public IEnumerable<VaultNoteSummaryDto> GetAll(GetUserVaultNotesDto dto)
     {
         var vaultContext = _contextFactory.CreateDbContext();
